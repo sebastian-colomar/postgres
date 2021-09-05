@@ -27,6 +27,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${name} \
     --network ${network} \
+    --read-only \
     --volume ${volume}:${mount} \
     ${image} \
     ${cmd}
