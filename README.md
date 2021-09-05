@@ -4,11 +4,12 @@
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
+container=postgres
 cmd='-c shared_buffers=256MB -c max_connections=200'
 image=library/postgres:latest
 mount=/var/lib/postgresql/data
-name=postgres
 network=postgres
+restart=always
 volume=postgres
 
 docker \
@@ -25,10 +26,10 @@ docker \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --name ${name} \
+    --name ${container} \
     --network ${network} \
     --read-only \
-    --restart always \
+    --restart ${restart} \
     --volume ${volume}:${mount} \
     ${image} \
     ${cmd}
