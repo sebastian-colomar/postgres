@@ -11,6 +11,7 @@ mount=/var/lib/postgresql/data
 network=postgres
 restart=always
 run=/run/postgresql
+user=postgres
 volume=postgres
 
 docker \
@@ -36,4 +37,11 @@ docker \
     ${image} \
     ${cmd}
 
+docker \
+    exec \
+    --interactive \
+    --tty \
+    --user ${user} \
+    ${container}
+    psql
 ```
