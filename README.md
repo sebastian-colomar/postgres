@@ -10,6 +10,7 @@ image=library/postgres:latest
 mount=/var/lib/postgresql/data
 network=postgres
 restart=always
+run=/run/postgresql
 volume=postgres
 
 docker \
@@ -30,6 +31,7 @@ docker \
     --network ${network} \
     --read-only \
     --restart ${restart} \
+    --volume ${run}:${run} \
     --volume ${volume}:${mount} \
     ${image} \
     ${cmd}
