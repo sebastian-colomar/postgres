@@ -42,6 +42,6 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container}
+    ${container} \
     psql
 ```
