@@ -28,6 +28,7 @@ docker \
     --name ${name} \
     --network ${network} \
     --read-only \
+    --restart always \
     --volume ${volume}:${mount} \
     ${image} \
     ${cmd}
