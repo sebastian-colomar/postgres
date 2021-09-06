@@ -21,22 +21,22 @@ volume_var=pg-master_var
 docker \
     network \
     create \
-    ${network}
+    ${network} \
 
 docker \
     volume \
     create \
-    ${volume_data}
+    ${volume_data} \
 
 docker \
     volume \
     create \
-    ${volume_run}
+    ${volume_run} \
 
 docker \
     volume \
     create \
-    ${volume_var}
+    ${volume_var} \
 
 docker \
     container \
@@ -52,7 +52,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
-    ${cmd}
+    ${cmd} \
 
 command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
 docker \
@@ -72,7 +72,7 @@ docker \
     psql \
     --command "${command}" \
     --dbname ${dbname} \
-    --username ${username}
+    --username ${username} \
 
 docker \
     exec \
@@ -82,14 +82,14 @@ docker \
     repuser \
     --connection-limit 5 \
     --replication \
-    --username ${username}
+    --username ${username} \
 
 docker \
     exec \
     --user ${user} \
     ${container} \
     mkdir \
-    ${mount_data}/${dir}
+    ${mount_data}/${dir} \
 
 file=pg_hba.conf
 docker \
@@ -119,7 +119,7 @@ docker \
 docker \
     container \
     restart \
-    ${container}
+    ${container} \
 
 volume_data=pg-slave_data
 volume_run=pg-slave_run
@@ -128,17 +128,17 @@ volume_var=pg-slave_var
 docker \
     volume \
     create \
-    ${volume_data}
+    ${volume_data} \
 
 docker \
     volume \
     create \
-    ${volume_run}
+    ${volume_run} \
 
 docker \
     volume \
     create \
-    ${volume_var}
+    ${volume_var} \
 
 cmd='-c shared_buffers=256MB -c max_connections=200'
 container=pg-slave
@@ -156,7 +156,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
-    ${cmd}
+    ${cmd} \
 
 cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
 entrypoint=pg_basebackup
@@ -170,12 +170,12 @@ docker \
     --network ${network} \
     --read-only \
     --restart ${restart} \
-    --rm
+    --rm \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
-    ${cmd}
+    ${cmd} \
 
 container=pg-alpine
 image=library/alpine:latest
@@ -216,7 +216,7 @@ docker \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     ${container} \
-    ${cmd}
+    ${cmd} \
 
 docker \
     container \
@@ -241,7 +241,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
-    ${cmd}
+    ${cmd} \
 ```
 ```
 command="SELECT * FROM guestbook;"
@@ -253,7 +253,7 @@ docker \
     psql \
     --command "${command}" \
     --dbname ${dbname} \
-    --username ${username}
+    --username ${username} \
 
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are replicating.');"
 container=pg-master
@@ -264,7 +264,7 @@ docker \
     psql \
     --command "${command}" \
     --dbname ${dbname} \
-    --username ${username}
+    --username ${username} \
 
 command="SELECT * FROM guestbook;"
 container=pg-slave
@@ -275,6 +275,6 @@ docker \
     psql \
     --command "${command}" \
     --dbname ${dbname} \
-    --username ${username}
+    --username ${username} \
 
 ```
