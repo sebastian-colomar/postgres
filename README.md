@@ -61,6 +61,8 @@ docker \
     ${container} \
     psql
 
+```
+```
 command='\l'
 dbname=postgres
 user=postgres
