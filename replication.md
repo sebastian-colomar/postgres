@@ -36,7 +36,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --read-only \
+    #--read-only \
     --restart ${restart} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
@@ -101,7 +101,7 @@ docker \
     ${container}:${PGDATA}/${file} \
     ${file} \
 
-echo "host replication repuser pg-slave trust" | tee --append ${file}
+echo "host replication repuser samenet trust" | tee --append ${file}
 docker \
     cp \
     ${file} \
@@ -144,7 +144,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --read-only \
+    #--read-only \
     --restart ${restart} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
@@ -167,7 +167,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --read-only \
+    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
@@ -191,7 +191,7 @@ docker \
     --interactive \
     --name ${container} \
     --network ${network} \
-    --read-only \
+    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
@@ -229,7 +229,7 @@ docker \
     --interactive \
     --name ${container} \
     --network ${network} \
-    --read-only \
+    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
@@ -252,7 +252,7 @@ docker \
     --interactive \
     --name ${container} \
     --network ${network} \
-    --read-only \
+    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
