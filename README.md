@@ -52,8 +52,6 @@ docker \
 
 ```
 ```
-dbname=postgres
-username=postgres
 docker \
     container \
     exec \
