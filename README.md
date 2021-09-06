@@ -7,7 +7,7 @@ POSTGRES_PASSWORD=mysecretpassword
 container=postgres
 cmd='-c shared_buffers=256MB -c max_connections=200'
 image=library/postgres:latest
-mount=/var/lib/postgresql/data
+mount=/var/lib/postgresql
 network=postgres
 restart=always
 run=/run/postgresql
