@@ -52,6 +52,8 @@ docker \
 
 ```
 ```
+dbname=postgres
+username=postgres
 docker \
     container \
     exec \
@@ -66,9 +68,6 @@ docker \
 ```
 ```
 command='\l'
-dbname=postgres
-user=postgres
-username=postgres
 docker \
     container \
     exec \
