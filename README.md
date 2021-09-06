@@ -59,6 +59,7 @@ docker \
     --tty \
     --user ${user} \
     ${container} \
+    bash
 
 ```
 ```
