@@ -36,12 +36,12 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    #--read-only \
     --restart ${restart} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
+    #--read-only \
 
 command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
 container=pg-master
@@ -144,12 +144,12 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    #--read-only \
     --restart ${restart} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
+    #--read-only \
 
 cmd="-rf ${PGDATA}"
 container=pg-rm
@@ -167,13 +167,13 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
+    #--read-only \
 
 cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
 container=pg-basebackup
@@ -191,13 +191,13 @@ docker \
     --interactive \
     --name ${container} \
     --network ${network} \
-    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
+    #--read-only \
 
 container=pg-slave
 file=postgresql.conf
@@ -229,13 +229,13 @@ docker \
     --interactive \
     --name ${container} \
     --network ${network} \
-    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
+    #--read-only \
 
 cmd='-c shared_buffers=256MB -c max_connections=200'
 container=pg-slave
@@ -252,11 +252,11 @@ docker \
     --interactive \
     --name ${container} \
     --network ${network} \
-    #--read-only \
     --restart ${restart} \
     --tty \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
+    #--read-only \
 ```
