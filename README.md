@@ -57,7 +57,7 @@ docker \
     exec \
     --interactive \
     --tty \
-    --user ${user} \
+    --user root \
     ${container} \
     bash
 
