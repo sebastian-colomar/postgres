@@ -1,3 +1,4 @@
+```
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
@@ -204,3 +205,4 @@ docker \
     --volume ${volume}:${mount} \
     ${image} \
     ${cmd}
+```
