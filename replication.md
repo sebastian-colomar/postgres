@@ -70,6 +70,8 @@ user=postgres
 username=postgres
 docker \
     exec \
+    --interactive \
+    --tty \
     --user ${user} \
     ${container} \
     createuser \
