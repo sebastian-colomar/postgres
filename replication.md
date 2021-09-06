@@ -76,14 +76,11 @@ user=postgres
 username=postgres
 docker \
     exec \
-    --interactive \
-    --tty \
     --user ${user} \
     ${container} \
     createuser \
     repuser \
     --connection-limit 5 \
-    --pwprompt \
     --replication \
     --username ${username}
 
@@ -104,7 +101,7 @@ docker \
     ${container}:${PGDATA}/${file} \
     ${file} \
 
-echo "host replication repuser pg-slave md5" | tee --append ${file}
+echo "host replication repuser pg-slave trust" | tee --append ${file}
 docker \
     cp \
     ${file} \
@@ -154,25 +151,20 @@ docker \
     ${image} \
     ${cmd}
 
-cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
-container=pg-slave
-entrypoint=pg_basebackup
-restart=always
+cmd="-rf ${PGDATA}"
+container=pg-rm
+entrypoint=rm
+restart=no
 volume_data=pg-slave_data
 volume_run=pg-slave_run
 
 docker \
-    volume \
-    create \
-    ${volume}
-docker \
     container \
-    exec \
+    run \
     --detach \
     --entrypoint ${entrypoint} \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --interactive \
     --name ${container} \
     --network ${network} \
     --read-only \
@@ -184,7 +176,7 @@ docker \
     ${cmd}
 
 cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
-container=pg-slave
+container=pg-basebackup
 entrypoint=pg_basebackup
 restart=no
 volume_data=pg-slave_data
@@ -192,8 +184,7 @@ volume_run=pg-slave_run
 
 docker \
     container \
-    exec \
-    --detach \
+    run \
     --entrypoint ${entrypoint} \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
@@ -215,7 +206,7 @@ docker \
     ${container}:${PGDATA}/${file} \
     ${file} \
 
-echo "primary_conninfo = 'host=pg-master port=5432 user=repuser password=repuser'" | tee --append ${file}
+echo "primary_conninfo = 'host=pg-master port=5432 user=repuser'" | tee --append ${file}
 docker \
     cp \
     ${file} \
