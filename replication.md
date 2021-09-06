@@ -198,7 +198,7 @@ docker \
 
 cmd='-c shared_buffers=256MB -c max_connections=200'
 container=pg-slave
-image=library/postgres:latest
+image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 restart=always
 docker \
     container \
