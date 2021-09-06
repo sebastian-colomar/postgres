@@ -4,8 +4,9 @@ POSTGRES_PASSWORD=mysecretpassword
 
 cmd='-c shared_buffers=256MB -c max_connections=200'
 image=library/postgres:latest
-mount_data=/var/lib/postgresql
+mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
+mount_var=/var/lib/postgresql
 network=postgres
 restart=always
 user=postgres
@@ -18,6 +19,7 @@ docker \
 container=pg-master
 volume_data=pg-master_data
 volume_run=pg-master_run
+volume_var=pg-master_var
 
 docker \
     volume \
@@ -27,6 +29,10 @@ docker \
     volume \
     create \
     ${volume_run}
+docker \
+    volume \
+    create \
+    ${volume_var}
 
 docker \
     container \
@@ -37,8 +43,9 @@ docker \
     --name ${container} \
     --network ${network} \
     --restart ${restart} \
-    --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
     ${image} \
     ${cmd}
     #--read-only \
@@ -131,6 +138,7 @@ container=pg-slave
 restart=always
 volume_data=pg-slave_data
 volume_run=pg-slave_run
+volume_var=pg-slave_var
 
 docker \
     volume \
@@ -145,32 +153,33 @@ docker \
     --name ${container} \
     --network ${network} \
     --restart ${restart} \
-    --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
     ${image} \
     ${cmd}
     #--read-only \
 
-cmd="-rf ${PGDATA}"
+cmd="-rf ${PGDATA}/*"
 container=pg-rm
 entrypoint=rm
 restart=no
 volume_data=pg-slave_data
 volume_run=pg-slave_run
+volume_var=pg-slave_var
 
 docker \
     container \
     run \
-    --detach \
     --entrypoint ${entrypoint} \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
     --restart ${restart} \
-    --tty \
-    --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
     ${image} \
     ${cmd}
     #--read-only \
@@ -181,6 +190,7 @@ entrypoint=pg_basebackup
 restart=no
 volume_data=pg-slave_data
 volume_run=pg-slave_run
+volume_var=pg-slave_var
 
 docker \
     container \
@@ -188,13 +198,12 @@ docker \
     --entrypoint ${entrypoint} \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --interactive \
     --name ${container} \
     --network ${network} \
     --restart ${restart} \
-    --tty \
-    --volume ${volume_run}:${mount_run} \
     --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
     ${image} \
     ${cmd}
     #--read-only \
