@@ -61,6 +61,18 @@ docker \
     --tty \
     --user ${user} \
     ${container} \
+
+```
+```
+dbname=postgres
+username=postgres
+docker \
+    container \
+    exec \
+    --interactive \
+    --tty \
+    --user ${user} \
+    ${container} \
     psql \
     --dbname ${dbname} \
     --username ${username} \
