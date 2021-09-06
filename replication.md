@@ -105,19 +105,6 @@ docker \
     ${file} \
     ${container}:${PGDATA}/${file} \
 
-file=postgresql.conf
-docker \
-    cp \
-    ${container}:${PGDATA}/${file} \
-    ${file} \
-
-echo "archive_mode = on" | tee --append ${file}
-echo "archive_command = 'test ! -f /${dir}/%f && cp %p /${dir}/%f'" | tee --append ${file}
-docker \
-    cp \
-    ${file} \
-    ${container}:${PGDATA}/${file} \
-
 docker \
     container \
     restart \
