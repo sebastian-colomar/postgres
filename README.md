@@ -52,6 +52,7 @@ docker \
     ${cmd}
 
 docker \
+    container \
     exec \
     --interactive \
     --tty \
@@ -64,6 +65,7 @@ dbname=postgres
 user=postgres
 username=postgres
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
