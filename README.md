@@ -6,22 +6,35 @@ POSTGRES_PASSWORD=mysecretpassword
 
 container=postgres
 cmd='-c shared_buffers=256MB -c max_connections=200'
-image=library/postgres:latest
-mount=/var/lib/postgresql
+image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
+mount_data=/var/lib/postgresql/data
+mount_run=/run/postgresql
+mount_var=/var/lib/postgresql
 network=postgres
 restart=always
-run=/run/postgresql
 user=postgres
-volume=postgres
+volume_data=postgres_data
+volume_run=postgres_run
+volume_var=postgres_var
 
 docker \
     volume \
     create \
-    ${volume}
+    ${volume_data}
+docker \
+    volume \
+    create \
+    ${volume_run}
+docker \
+    volume \
+    create \
+    ${volume_var}
+
 docker \
     network \
     create \
     ${network}
+    
 docker \
     container \
     run \
@@ -32,8 +45,9 @@ docker \
     --network ${network} \
     --read-only \
     --restart ${restart} \
-    --volume ${run}:${run} \
-    --volume ${volume}:${mount} \
+    --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
     ${image} \
     ${cmd}
 
