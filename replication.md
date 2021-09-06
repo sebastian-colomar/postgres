@@ -140,24 +140,6 @@ docker \
     create \
     ${volume_var} \
 
-cmd='-c shared_buffers=256MB -c max_connections=200'
-container=pg-slave
-docker \
-    container \
-    run \
-    --detach \
-    --env PGDATA=${PGDATA} \
-    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --name ${container} \
-    --network ${network} \
-    --read-only \
-    --restart ${restart} \
-    --volume ${volume_data}:${mount_data} \
-    --volume ${volume_run}:${mount_run} \
-    --volume ${volume_var}:${mount_var} \
-    ${image} \
-    ${cmd} \
-
 cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
 entrypoint=pg_basebackup
 restart=no
