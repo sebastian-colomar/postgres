@@ -59,7 +59,9 @@ docker \
     --tty \
     --user ${user} \
     ${container} \
-    psql
+    psql \
+    --dbname ${dbname} \
+    --username ${username} \
 
 ```
 ```
