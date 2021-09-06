@@ -44,4 +44,18 @@ docker \
     --user ${user} \
     ${container} \
     psql
+
+command='\l'
+dbname=postgres
+user=postgres
+username=postgres
+docker \
+    exec \
+    --user ${user} \
+    ${container} \
+    psql \
+    --command ${command} \
+    --dbname ${dbname} \
+    --username ${username} \    
+    
 ```
