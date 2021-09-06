@@ -54,6 +54,8 @@ docker \
     ${image} \
     ${cmd} \
 
+```
+```
 command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
 docker \
     exec \
@@ -147,8 +149,6 @@ docker \
     container \
     run \
     --entrypoint ${entrypoint} \
-    --env PGDATA=${PGDATA} \
-    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --network ${network} \
     --read-only \
     --restart ${restart} \
@@ -166,8 +166,6 @@ docker \
     container \
     run \
     --detach \
-    --env PGDATA=${PGDATA} \
-    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
     --read-only \
@@ -195,8 +193,6 @@ restart=no
 docker \
     container \
     exec \
-    --env PGDATA=${PGDATA} \
-    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     ${container} \
     ${cmd} \
 
@@ -224,6 +220,7 @@ docker \
     --volume ${volume_var}:${mount_var} \
     ${image} \
     ${cmd} \
+    
 ```
 ```
 command="SELECT * FROM guestbook;"
