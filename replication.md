@@ -58,6 +58,7 @@ docker \
 ```
 command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
@@ -68,6 +69,7 @@ docker \
 
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ( 'jim@gmail.com', current_date, 'This is a test.');"
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
@@ -77,6 +79,7 @@ docker \
     --username ${username} \
 
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
@@ -87,6 +90,7 @@ docker \
     --username ${username} \
 
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
@@ -95,12 +99,14 @@ docker \
 
 file=pg_hba.conf
 docker \
+    container \
     cp \
     ${container}:${PGDATA}/${file} \
     ${file} \
 
 echo "host replication repuser samenet trust" | tee --append ${file}
 docker \
+    container \
     cp \
     ${file} \
     ${container}:${PGDATA}/${file} \
@@ -165,12 +171,14 @@ docker \
 
 file=postgresql.conf
 docker \
+    container \
     cp \
     ${container}:${PGDATA}/${file} \
     ${file} \
 
 echo "primary_conninfo = 'host=pg-master port=5432 user=repuser'" | tee --append ${file}
 docker \
+    container \
     cp \
     ${file} \
     ${container}:${PGDATA}/${file} \
@@ -213,6 +221,7 @@ docker \
 command="SELECT * FROM guestbook;"
 container=pg-slave
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
@@ -224,6 +233,7 @@ docker \
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are replicating.');"
 container=pg-master
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
@@ -235,6 +245,7 @@ docker \
 command="SELECT * FROM guestbook;"
 container=pg-slave
 docker \
+    container \
     exec \
     --user ${user} \
     ${container} \
