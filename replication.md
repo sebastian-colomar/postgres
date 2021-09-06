@@ -4,10 +4,10 @@ POSTGRES_PASSWORD=mysecretpassword
 
 cmd='-c shared_buffers=256MB -c max_connections=200'
 image=library/postgres:latest
-mount=/var/lib/postgresql
+mount_data=/var/lib/postgresql
+mount_run=/run/postgresql
 network=postgres
 restart=always
-run=/run/postgresql
 user=postgres
 
 docker \
@@ -16,12 +16,18 @@ docker \
     ${network}
 
 container=pg-master
-volume=pg-master
+volume_data=pg-master_data
+volume_run=pg-master_run
 
 docker \
     volume \
     create \
-    ${volume}
+    ${volume_data}
+docker \
+    volume \
+    create \
+    ${volume_run}
+
 docker \
     container \
     run \
@@ -32,8 +38,8 @@ docker \
     --network ${network} \
     --read-only \
     --restart ${restart} \
-    --volume ${run}:${run} \
-    --volume ${volume}:${mount} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
 
@@ -89,7 +95,7 @@ docker \
     --user ${user} \
     ${container} \
     mkdir \
-    ${mount}/${dir}
+    ${mount_data}/${dir}
 
 container=pg-master
 file=pg_hba.conf
@@ -123,11 +129,11 @@ docker \
     restart \
     ${container}
 
-cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
+cmd='-c shared_buffers=256MB -c max_connections=200'
 container=pg-slave
-entrypoint=pg_basebackup
-restart=no
-volume=pg-slave
+restart=always
+volume_data=pg-slave_data
+volume_run=pg-slave_run
 
 docker \
     volume \
@@ -136,6 +142,32 @@ docker \
 docker \
     container \
     run \
+    --detach \
+    --env PGDATA=${PGDATA} \
+    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+    --name ${container} \
+    --network ${network} \
+    --read-only \
+    --restart ${restart} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_data}:${mount_data} \
+    ${image} \
+    ${cmd}
+
+cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
+container=pg-slave
+entrypoint=pg_basebackup
+restart=always
+volume_data=pg-slave_data
+volume_run=pg-slave_run
+
+docker \
+    volume \
+    create \
+    ${volume}
+docker \
+    container \
+    exec \
     --detach \
     --entrypoint ${entrypoint} \
     --env PGDATA=${PGDATA} \
@@ -146,8 +178,33 @@ docker \
     --read-only \
     --restart ${restart} \
     --tty \
-    --volume ${run}:${run} \
-    --volume ${volume}:${mount} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_data}:${mount_data} \
+    ${image} \
+    ${cmd}
+
+cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
+container=pg-slave
+entrypoint=pg_basebackup
+restart=no
+volume_data=pg-slave_data
+volume_run=pg-slave_run
+
+docker \
+    container \
+    exec \
+    --detach \
+    --entrypoint ${entrypoint} \
+    --env PGDATA=${PGDATA} \
+    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+    --interactive \
+    --name ${container} \
+    --network ${network} \
+    --read-only \
+    --restart ${restart} \
+    --tty \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
 
@@ -168,6 +225,8 @@ cmd="${PGDATA}/standby.signal"
 container=pg-slave
 entrypoint=touch
 restart=no
+volume_data=pg-slave_data
+volume_run=pg-slave_run
 
 docker \
     container \
@@ -182,14 +241,16 @@ docker \
     --read-only \
     --restart ${restart} \
     --tty \
-    --volume ${run}:${run} \
-    --volume ${volume}:${mount} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
 
 cmd='-c shared_buffers=256MB -c max_connections=200'
 container=pg-slave
 restart=always
+volume_data=pg-slave_data
+volume_run=pg-slave_run
 
 docker \
     container \
@@ -203,8 +264,8 @@ docker \
     --read-only \
     --restart ${restart} \
     --tty \
-    --volume ${run}:${run} \
-    --volume ${volume}:${mount} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_data}:${mount_data} \
     ${image} \
     ${cmd}
 ```
