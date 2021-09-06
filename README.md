@@ -56,6 +56,6 @@ docker \
     psql \
     --command ${command} \
     --dbname ${dbname} \
-    --username ${username} \    
+    --username ${username} \
     
 ```
