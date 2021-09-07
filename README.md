@@ -62,15 +62,9 @@ docker \
 
 ```
 ```
+command='\l'
 dbname=postgres
 username=postgres
-psql \
-    --dbname ${dbname} \
-    --username ${username} \
-
-```
-```
-command='\l'
 psql \
     --command "${command}" \
     --dbname ${dbname} \
