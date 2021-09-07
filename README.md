@@ -47,7 +47,6 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
-    ${cmd} \
 
 cmd='/bin/bash'
 docker \
