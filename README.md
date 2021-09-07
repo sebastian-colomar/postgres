@@ -50,8 +50,6 @@ docker \
     ${image} \
     ${cmd} \
 
-```
-```
 docker \
     container \
     exec \
@@ -63,28 +61,19 @@ docker \
 
 ```
 ```
+su --login postgres
+```
+```
 dbname=postgres
 username=postgres
-docker \
-    container \
-    exec \
-    --interactive \
-    --tty \
-    --user ${user} \
-    ${container} \
-    psql \
+psql \
     --dbname ${dbname} \
     --username ${username} \
 
 ```
 ```
 command='\l'
-docker \
-    container \
-    exec \
-    --user ${user} \
-    ${container} \
-    psql \
+psql \
     --command "${command}" \
     --dbname ${dbname} \
     --username ${username} \
