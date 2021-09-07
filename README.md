@@ -48,7 +48,16 @@ docker \
     --volume ${volume_var}:${mount_var} \
     ${image} \
 
-cmd='apt-get update && apt-get install -y procps net-tools vim'
+cmd='apt-get update'
+docker \
+    container \
+    exec \
+    --tty \
+    --user root \
+    ${container} \
+    ${cmd} \
+
+cmd='apt-get install -y procps net-tools vim'
 docker \
     container \
     exec \
