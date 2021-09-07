@@ -4,7 +4,6 @@ POSTGRES_PASSWORD=mysecretpassword
 
 dbname=postgres
 container=pg-master
-dir=archivedir
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
@@ -103,6 +102,7 @@ createuser \
     --replication \
     --username ${username} \
 
+dir=archivedir
 mkdir \
     ${mount_data}/${dir} \
 
