@@ -113,6 +113,7 @@ mkdir \
 file=pg_hba.conf
 echo "host replication repuser samenet trust" | tee --append ${PGDATA}/${file}
 
+exit
 ```
 ```
 docker \
@@ -148,10 +149,11 @@ pg_basebackup \
     --verbose \
     --wal-method stream \
 
+exit
 ```
 ```
 container=pg-alpine
-image=library/alpine:latest
+image=library/debian:slim
 restart=no
 docker \
     container \
@@ -174,6 +176,7 @@ file=postgresql.conf
 echo "primary_conninfo = 'host=pg-master port=5432 user=repuser'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
+exit
 ```
 ```
 container=pg-slave
@@ -217,6 +220,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+exit
 ```
 ```
 container=pg-master
@@ -239,6 +243,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+exit
 ```
 ```
 container=pg-slave
@@ -261,6 +266,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+exit
 ```
 ```
 container=pg-master
@@ -285,6 +291,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+exit
 ```
 ```
 container=pg-slave
@@ -307,6 +314,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+exit
 ```
 ```
 docker container rm --force $( docker container ls --all --quiet )
