@@ -5,7 +5,6 @@ PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
 container=postgres
-cmd='-c shared_buffers=256MB -c max_connections=200'
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
