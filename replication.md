@@ -2,8 +2,9 @@
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
-dbname=postgres
 container=pg-master
+dbname=postgres
+dir=archivedir
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
@@ -76,6 +77,10 @@ cmd=/bin/bash
 docker \
     container \
     exec \
+    --env dbname=${dbname} \
+    --env dir=${dir} \
+    --env mount_data=${mount_data} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
@@ -102,7 +107,6 @@ createuser \
     --replication \
     --username ${username} \
 
-dir=archivedir
 mkdir \
     ${mount_data}/${dir} \
 
@@ -122,10 +126,13 @@ docker \
     container \
     run \
     --entrypoint ${entrypoint} \
+    --interactive \
     --network ${network} \
     --read-only \
     --restart ${restart} \
     --rm \
+    --tty \
+    --user ${user} \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
@@ -194,6 +201,8 @@ container=pg-slave
 docker \
     container \
     exec \
+    --env dbname=${dbname} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
@@ -214,6 +223,8 @@ container=pg-master
 docker \
     container \
     exec \
+    --env dbname=${dbname} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
@@ -234,6 +245,8 @@ container=pg-slave
 docker \
     container \
     exec \
+    --env dbname=${dbname} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
@@ -254,6 +267,9 @@ container=pg-master
 docker \
     container \
     exec \
+    --env PGDATA=${PGDATA} \
+    --env dbname=${dbname} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
@@ -275,6 +291,8 @@ container=pg-slave
 docker \
     container \
     exec \
+    --env dbname=${dbname} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
