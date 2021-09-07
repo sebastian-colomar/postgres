@@ -50,6 +50,7 @@ docker \
     ${image} \
     ${cmd} \
 
+cmd='/bin/bash'
 docker \
     container \
     exec \
@@ -57,7 +58,7 @@ docker \
     --tty \
     --user ${user} \
     ${container} \
-    bash
+    ${cmd} \
 
 ```
 ```
