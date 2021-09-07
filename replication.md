@@ -72,6 +72,7 @@ docker \
     ${volume_var} \
 
 ```
+EXECUTE TERMINAL INSIDE MASTER
 ```
 cmd=/bin/bash
 docker \
@@ -88,6 +89,7 @@ docker \
     ${cmd} \
 
 ```
+CREATE SAMPLE TABLE AND CONFIGURE REPLICATION
 ```
 command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
 psql \
@@ -115,6 +117,7 @@ echo "host replication repuser samenet trust" | tee --append ${PGDATA}/${file}
 
 exit
 ```
+RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
 docker \
     container \
@@ -140,6 +143,7 @@ docker \
     ${image} \
 
 ```
+RUN BASE BACKUP
 ```
 pg_basebackup \
     --host pg-master \
@@ -151,6 +155,7 @@ pg_basebackup \
 
 exit
 ```
+RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
 container=pg-alpine
 image=library/debian:slim
@@ -171,6 +176,7 @@ docker \
     ${image} \
 
 ```
+CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
 echo "primary_conninfo = 'host=pg-master port=5432 user=repuser'" | tee --append ${PGDATA}/${file}
@@ -178,6 +184,7 @@ touch ${PGDATA}/standby.signal
 
 exit
 ```
+START SLAVE
 ```
 container=pg-slave
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
@@ -198,6 +205,7 @@ docker \
     ${image} \
     
 ```
+EXECUTE TERMINAL IN SLAVE
 ```
 cmd=/bin/bash
 container=pg-slave
@@ -213,6 +221,7 @@ docker \
     ${cmd} \
 
 ```
+VIEW SAMPLE TABLE
 ```
 command="SELECT * FROM guestbook;"
 psql \
@@ -222,6 +231,7 @@ psql \
 
 exit
 ```
+EXECUTE TERMINAL IN MASTER
 ```
 container=pg-master
 docker \
@@ -236,6 +246,7 @@ docker \
     ${cmd} \
 
 ```
+INSERT NEW SAMPLE ROW
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are replicating.');"
 psql \
@@ -245,6 +256,7 @@ psql \
 
 exit
 ```
+EXECUTE TERMINAL IN SLAVE
 ```
 container=pg-slave
 docker \
@@ -259,6 +271,7 @@ docker \
     ${cmd} \
 
 ```
+VIEW SAMPLE TABLE TO CHECK REPLICATION
 ```
 command="SELECT * FROM guestbook;"
 psql \
@@ -268,6 +281,7 @@ psql \
 
 exit
 ```
+EXECUTE TERMINAL IN MASTER
 ```
 container=pg-master
 docker \
@@ -283,6 +297,7 @@ docker \
     ${cmd} \
 
 ```
+DEMOTE MASTER AND TRY TO WRITE
 ```
 touch ${PGDATA}/standby.signal
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
@@ -293,6 +308,7 @@ psql \
 
 exit
 ```
+EXECUTE TERMINAL IN SLAVE
 ```
 container=pg-slave
 docker \
@@ -307,6 +323,7 @@ docker \
     ${cmd} \
 
 ```
+TRY TO WRITE
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
 psql \
@@ -316,6 +333,7 @@ psql \
 
 exit
 ```
+CLEAN UP
 ```
 docker container rm --force $( docker container ls --all --quiet )
 docker network rm $( docker network ls --quiet )
