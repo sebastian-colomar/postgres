@@ -359,6 +359,29 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+```
+PROMOTE SLAVE
+```
+pg_ctl promote
+
+```
+TRY AGAIN TO WRITE
+```
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
+psql \
+    --command "${command}" \
+    --dbname ${dbname} \
+    --username ${username} \
+
+```
+VIEW SAMPLE TABLE TO CHECK NEW MASTER
+```
+command="SELECT * FROM guestbook;"
+psql \
+    --command "${command}" \
+    --dbname ${dbname} \
+    --username ${username} \
+
 exit
 ```
 CLEAN UP
