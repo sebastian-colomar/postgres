@@ -55,13 +55,10 @@ docker \
     exec \
     --interactive \
     --tty \
-    --user root \
+    --user ${user} \
     ${container} \
     bash
 
-```
-```
-su --login postgres
 ```
 ```
 dbname=postgres
