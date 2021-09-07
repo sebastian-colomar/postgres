@@ -129,6 +129,7 @@ restart=no
 docker \
     container \
     run \
+    --env PGDATA=${PGDATA} \
     --entrypoint ${entrypoint} \
     --interactive \
     --network ${network} \
