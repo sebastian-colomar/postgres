@@ -384,6 +384,8 @@ psql \
 
 exit
 ```
+TO DO: CONFIGURE OLD MASTER TO LISTEN TO NEW MASTER
+
 CLEAN UP
 ```
 docker container rm --force $( docker container ls --all --quiet )
