@@ -290,6 +290,33 @@ docker \
     container \
     exec \
     --env PGDATA=${PGDATA} \
+    --interactive \
+    --tty \
+    --user ${user} \
+    ${container} \
+    ${cmd} \
+
+```
+DEMOTE MASTER
+```
+touch ${PGDATA}/standby.signal
+
+exit
+```
+RESTART MASTER
+```
+docker \
+    container \
+    restart \
+    ${container} \
+
+```
+EXECUTE TERMINAL IN MASTER
+```
+container=pg-master
+docker \
+    container \
+    exec \
     --env dbname=${dbname} \
     --env username=${username} \
     --interactive \
@@ -299,9 +326,8 @@ docker \
     ${cmd} \
 
 ```
-DEMOTE MASTER AND TRY TO WRITE
-```
-touch ${PGDATA}/standby.signal
+TRY TO WRITE IN DEMOTED MASTER
+ ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
 psql \
     --command "${command}" \
