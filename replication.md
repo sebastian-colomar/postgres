@@ -158,7 +158,7 @@ exit
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
 container=pg-alpine
-image=library/debian:slim
+image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 restart=no
 docker \
     container \
