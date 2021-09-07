@@ -71,6 +71,8 @@ docker \
     create \
     ${volume_var} \
 
+```
+```
 cmd=/bin/bash
 docker \
     container \
@@ -286,5 +288,11 @@ psql \
     --command "${command}" \
     --dbname ${dbname} \
     --username ${username} \
+
+```
+```
+docker container rm --force $( docker container ls --all --quiet )
+docker network rm $( docker network ls --quiet )
+docker volume rm $( docker volume ls --quiet )
 
 ```
