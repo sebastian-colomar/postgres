@@ -71,7 +71,7 @@ docker \
     create \
     ${volume_var} \
 
-cmd='/bin/bash'
+cmd=/bin/bash
 docker \
     container \
     exec \
@@ -131,9 +131,13 @@ docker \
 
 ```
 ```
-cmd="--host pg-master --pgdata ${PGDATA} --progress --username repuser --verbose --wal-method stream"
 pg_basebackup \
-    ${cmd} \
+    --host pg-master \
+    --pgdata ${PGDATA} \
+    --progress \
+    --username repuser \
+    --verbose \
+    --wal-method stream \
 
 ```
 ```
