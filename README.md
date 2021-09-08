@@ -10,7 +10,7 @@ mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
-sleep=1
+sleep=3
 user=postgres
 volume_data=postgres_data
 volume_run=postgres_run
@@ -51,8 +51,8 @@ docker \
 
 while true
     do
-        docker container ls | grep Up.*${container} && break
         sleep ${sleep}
+        docker container ls | grep Up.*${container} && break
     done
 
 cmd='/bin/bash'
