@@ -41,7 +41,6 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
