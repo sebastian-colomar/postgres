@@ -168,7 +168,6 @@ exit
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
-container=pg-alpine
 image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 docker \
     container \
@@ -178,9 +177,9 @@ docker \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
-    --name ${container_slave} \
     --network ${network} \
     --read-only \
+    --rm \
     --tty \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
