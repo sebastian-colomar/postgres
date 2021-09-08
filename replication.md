@@ -4,13 +4,11 @@ POSTGRES_PASSWORD=mysecretpassword
 
 container=pg-master
 dbname=postgres
-dir=archivedir
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=replication
-restart=always
 user=postgres
 username=postgres
 volume_data=pg-master_data
@@ -45,7 +43,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --restart ${restart} \
+    --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
@@ -92,7 +90,6 @@ docker \
     container \
     exec \
     --env dbname=${dbname} \
-    --env dir=${dir} \
     --env mount_data=${mount_data} \
     --env username=${username} \
     --interactive \
@@ -117,8 +114,7 @@ psql \
     --username ${username} \
 
 createuser \
-    repuser \
-    --connection-limit 5 \
+    replicator \
     --replication \
     --username ${username} \
 
@@ -126,7 +122,7 @@ mkdir \
     ${mount_data}/${dir} \
 
 file=pg_hba.conf
-echo "host replication repuser samenet trust" | tee --append ${PGDATA}/${file}
+echo "host replication replicator samenet trust" | tee --append ${PGDATA}/${file}
 
 exit
 ```
@@ -138,7 +134,6 @@ docker \
     ${container} \
 
 entrypoint=/bin/bash
-restart=no
 docker \
     container \
     run \
@@ -147,7 +142,6 @@ docker \
     --interactive \
     --network ${network} \
     --read-only \
-    --restart ${restart} \
     --rm \
     --tty \
     --user ${user} \
@@ -163,7 +157,7 @@ pg_basebackup \
     --host pg-master \
     --pgdata ${PGDATA} \
     --progress \
-    --username repuser \
+    --username replicator \
     --verbose \
     --wal-method stream \
 
@@ -173,7 +167,6 @@ RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
 container=pg-alpine
 image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
-restart=no
 docker \
     container \
     run \
@@ -183,7 +176,6 @@ docker \
     --name ${container} \
     --network ${network} \
     --read-only \
-    --restart ${restart} \
     --tty \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
@@ -203,7 +195,6 @@ START SLAVE
 ```
 container=pg-slave
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
-restart=always
 docker \
     container \
     run \
@@ -212,13 +203,26 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --read-only \
-    --restart ${restart} \
+    --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
     
+cmd='apt-get update'
+docker \
+    container \
+    exec \
+    ${container} \
+    ${cmd} \
+
+cmd='apt-get install -y procps net-tools vim'
+docker \
+    container \
+    exec \
+    ${container} \
+    ${cmd} \
+
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
