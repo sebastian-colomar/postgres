@@ -45,7 +45,6 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --read-only \
     --restart ${restart} \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
@@ -71,9 +70,6 @@ docker \
     create \
     ${volume_var} \
 
-```
-EXECUTE TERMINAL INSIDE MASTER
-```
 cmd='apt-get update'
 docker \
     container \
@@ -88,6 +84,9 @@ docker \
     ${container} \
     ${cmd} \
 
+```
+EXECUTE TERMINAL INSIDE MASTER
+```
 cmd=/bin/bash
 docker \
     container \
