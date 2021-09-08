@@ -49,7 +49,11 @@ docker \
     --volume ${volume_var}:${mount_var} \
     ${image} \
 
-sleep ${sleep}
+while true
+    do
+        docker container ls | grep Up.*${container} && break
+        sleep ${sleep}
+    done
 
 cmd='/bin/bash'
 docker \
