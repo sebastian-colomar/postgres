@@ -5,7 +5,7 @@ POSTGRES_PASSWORD=mysecretpassword
 container_master=pg-master
 container_slave=pg-slave
 dbname=postgres
-image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
+image=academiaonline/postgres:3.0
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
@@ -46,6 +46,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container_master} \
     --network ${network} \
+    --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
@@ -70,20 +71,6 @@ docker \
     volume \
     create \
     ${volume_var} \
-
-cmd='apt-get update'
-docker \
-    container \
-    exec \
-    ${container_master} \
-    ${cmd} \
-
-cmd='apt-get install -y procps net-tools vim'
-docker \
-    container \
-    exec \
-    ${container_master} \
-    ${cmd} \
 
 ```
 EXECUTE TERMINAL INSIDE MASTER
@@ -168,7 +155,7 @@ exit
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
-image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
+debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 docker \
     container \
     run \
@@ -184,7 +171,7 @@ docker \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
-    ${image} \
+    ${debian_image} \
 
 ```
 CONFIGURE STREAMING REPLICATION IN SLAVE
@@ -197,7 +184,6 @@ exit
 ```
 START SLAVE
 ```
-image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 docker \
     container \
     run \
@@ -206,26 +192,13 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container_slave} \
     --network ${network} \
+    --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
     
-cmd='apt-get update'
-docker \
-    container \
-    exec \
-    ${container_slave} \
-    ${cmd} \
-
-cmd='apt-get install -y procps net-tools vim'
-docker \
-    container \
-    exec \
-    ${container_slave} \
-    ${cmd} \
-
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
