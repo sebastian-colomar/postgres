@@ -75,14 +75,14 @@ cmd='apt-get update'
 docker \
     container \
     exec \
-    ${container} \
+    ${container_master} \
     ${cmd} \
 
 cmd='apt-get install -y procps net-tools vim'
 docker \
     container \
     exec \
-    ${container} \
+    ${container_master} \
     ${cmd} \
 
 ```
