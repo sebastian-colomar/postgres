@@ -5,7 +5,7 @@ PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
 container=postgres
-image=academiaonline/postgres:3.1
+image=academiaonline/postgres:latest
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
