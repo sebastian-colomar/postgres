@@ -2,7 +2,8 @@
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
-container=pg-master
+container_master=pg-master
+container_slave=pg-slave
 dbname=postgres
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 mount_data=/var/lib/postgresql/data
