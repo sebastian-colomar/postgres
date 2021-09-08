@@ -10,7 +10,6 @@ mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
-restart=always
 user=postgres
 volume_data=postgres_data
 volume_run=postgres_run
@@ -42,7 +41,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
-    --restart ${restart} \
+    --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
