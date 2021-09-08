@@ -116,12 +116,9 @@ psql \
     --username ${username} \
 
 createuser \
-    replicator \
+    ${user_replication} \
     --replication \
     --username ${username} \
-
-mkdir \
-    ${mount_data}/${dir} \
 
 file=pg_hba.conf
 echo "host replication ${user_replication} samenet trust" | tee --append ${PGDATA}/${file}
