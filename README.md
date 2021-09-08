@@ -5,11 +5,12 @@ PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
 container=postgres
-image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
+image=academiaonline/postgres:latest
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
+sleep=3
 user=postgres
 volume_data=postgres_data
 volume_run=postgres_run
@@ -41,29 +42,18 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container} \
     --network ${network} \
+    --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
 
-cmd='apt-get update'
-docker \
-    container \
-    exec \
-    --tty \
-    --user root \
-    ${container} \
-    ${cmd} \
-
-cmd='apt-get install -y procps net-tools vim'
-docker \
-    container \
-    exec \
-    --tty \
-    --user root \
-    ${container} \
-    ${cmd} \
+while true
+    do
+        sleep ${sleep}
+        docker container ls | grep Up.*${container} && break
+    done
 
 cmd='/bin/bash'
 docker \
