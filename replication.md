@@ -11,6 +11,7 @@ mount_var=/var/lib/postgresql
 network=replication
 user=postgres
 username=postgres
+user_replication=replicator
 volume_data=pg-master_data
 volume_run=pg-master_run
 volume_var=pg-master_var
@@ -92,6 +93,7 @@ docker \
     --env dbname=${dbname} \
     --env mount_data=${mount_data} \
     --env username=${username} \
+    --env user_replication=${user_replication} \
     --interactive \
     --tty \
     --user ${user} \
@@ -122,7 +124,7 @@ mkdir \
     ${mount_data}/${dir} \
 
 file=pg_hba.conf
-echo "host replication replicator samenet trust" | tee --append ${PGDATA}/${file}
+echo "host replication ${user_replication} samenet trust" | tee --append ${PGDATA}/${file}
 
 exit
 ```
@@ -138,6 +140,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
+    --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
     --network ${network} \
@@ -157,7 +160,7 @@ pg_basebackup \
     --host pg-master \
     --pgdata ${PGDATA} \
     --progress \
-    --username replicator \
+    --username ${user_replication} \
     --verbose \
     --wal-method stream \
 
@@ -171,6 +174,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
+    --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
     --name ${container} \
@@ -186,7 +190,7 @@ docker \
 CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=pg-master port=5432 user=repuser'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=pg-master port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
