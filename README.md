@@ -10,6 +10,7 @@ mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
+sleep=1
 user=postgres
 volume_data=postgres_data
 volume_run=postgres_run
@@ -47,6 +48,8 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
+
+sleep ${sleep}
 
 cmd='/bin/bash'
 docker \
