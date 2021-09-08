@@ -13,9 +13,10 @@ network=replication
 user=postgres
 username=postgres
 user_replication=replicator
-volume_data=pg-master_data
-volume_run=pg-master_run
-volume_var=pg-master_var
+
+volume_data=${container_master}_data
+volume_run=${container_master}_run
+volume_var=${container_master}_var
 
 docker \
     network \
@@ -43,7 +44,7 @@ docker \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --name ${container} \
+    --name ${container_master} \
     --network ${network} \
     --restart always \
     --volume ${volume_data}:${mount_data} \
@@ -51,9 +52,9 @@ docker \
     --volume ${volume_var}:${mount_var} \
     ${image} \
 
-volume_data=pg-slave_data
-volume_run=pg-slave_run
-volume_var=pg-slave_var
+volume_data=${container_slave}_data
+volume_run=${container_slave}_run
+volume_var=${container_slave}_var
 
 docker \
     volume \
@@ -98,7 +99,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_master} \
     ${cmd} \
 
 ```
@@ -131,13 +132,14 @@ RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 docker \
     container \
     restart \
-    ${container} \
+    ${container_master} \
 
 entrypoint=/bin/bash
 docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
+    --env container_master=${container_master} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
@@ -155,7 +157,7 @@ docker \
 RUN BASE BACKUP
 ```
 pg_basebackup \
-    --host pg-master \
+    --host ${container_master} \
     --pgdata ${PGDATA} \
     --progress \
     --username ${user_replication} \
@@ -172,10 +174,11 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
+    --env container_master=${container_master} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
-    --name ${container} \
+    --name ${container_slave} \
     --network ${network} \
     --read-only \
     --tty \
@@ -188,14 +191,13 @@ docker \
 CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=pg-master port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${container_master} port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
 ```
 START SLAVE
 ```
-container=pg-slave
 image=library/postgres:12.8-buster@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 docker \
     container \
@@ -203,7 +205,7 @@ docker \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --name ${container} \
+    --name ${container_slave} \
     --network ${network} \
     --restart always \
     --volume ${volume_data}:${mount_data} \
@@ -215,21 +217,20 @@ cmd='apt-get update'
 docker \
     container \
     exec \
-    ${container} \
+    ${container_slave} \
     ${cmd} \
 
 cmd='apt-get install -y procps net-tools vim'
 docker \
     container \
     exec \
-    ${container} \
+    ${container_slave} \
     ${cmd} \
 
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
 cmd=/bin/bash
-container=pg-slave
 docker \
     container \
     exec \
@@ -238,7 +239,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_slave} \
     ${cmd} \
 
 ```
@@ -254,7 +255,6 @@ exit
 ```
 EXECUTE TERMINAL IN MASTER
 ```
-container=pg-master
 docker \
     container \
     exec \
@@ -263,7 +263,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_master} \
     ${cmd} \
 
 ```
@@ -279,7 +279,6 @@ exit
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
-container=pg-slave
 docker \
     container \
     exec \
@@ -288,7 +287,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_slave} \
     ${cmd} \
 
 ```
@@ -304,7 +303,6 @@ exit
 ```
 EXECUTE TERMINAL IN MASTER
 ```
-container=pg-master
 docker \
     container \
     exec \
@@ -312,7 +310,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_master} \
     ${cmd} \
 
 ```
@@ -327,12 +325,11 @@ RESTART MASTER
 docker \
     container \
     restart \
-    ${container} \
+    ${container_master} \
 
 ```
 EXECUTE TERMINAL IN MASTER
 ```
-container=pg-master
 docker \
     container \
     exec \
@@ -341,7 +338,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_master} \
     ${cmd} \
 
 ```
@@ -357,7 +354,6 @@ exit
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
-container=pg-slave
 docker \
     container \
     exec \
@@ -366,7 +362,7 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container} \
+    ${container_slave} \
     ${cmd} \
 
 ```
