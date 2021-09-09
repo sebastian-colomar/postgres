@@ -77,6 +77,8 @@ docker \
 ```
 chown postgres:postgres --recursive ${mount_logs}
 apt-get update && apt-get install -y syslog-ng
+```
+```
 su --login postgres
 ```
 ```
