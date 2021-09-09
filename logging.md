@@ -75,6 +75,7 @@ docker \
 ```
 apt-get update && apt-get install -y syslog-ng
 ```
+```
 su --login postgres
 command='\l'
 dbname=postgres
