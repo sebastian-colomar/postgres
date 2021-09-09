@@ -359,7 +359,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env recovery_target_time=${recovery_target_time} \
+    --env recovery_target_time="${recovery_target_time}" \
     --env mount_archive=${mount_archive} \
     --entrypoint ${entrypoint} \
     --interactive \
@@ -380,7 +380,7 @@ echo "recovery_target_action = pause" | tee --append ${PGDATA}/${file}
 echo "recovery_target_inclusive = false" | tee --append ${PGDATA}/${file}
 echo "recovery_target_time = '${recovery_target_time}'" | tee --append ${PGDATA}/${file}
 echo "restore_command = 'cp ${mount_archive}/%f %p'" | tee --append ${PGDATA}/${file}
-
+exit
 ```
 RESTART SLAVE
 ```
