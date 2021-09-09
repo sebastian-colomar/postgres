@@ -131,6 +131,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+sleep 100
 createuser \
     ${user_replication} \
     --replication \
@@ -143,6 +144,7 @@ file=postgresql.conf
 echo "archive_command = 'test ! -f ${mount_archive}/%f && cp %p ${mount_archive}/%f'" | tee --append ${PGDATA}/${file}
 echo "archive_mode = on" | tee --append ${PGDATA}/${file}
 echo "archive_timeout = 100" | tee --append ${PGDATA}/${file}
+echo "checkpoint_timeout = 100" | tee --append ${PGDATA}/${file}
 
 exit
 ```
@@ -208,7 +210,7 @@ CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
 echo "primary_conninfo = 'host=${container_master} port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
-echo "recovery_min_apply_delay = 5min" | tee --append ${PGDATA}/${file}
+echo "recovery_min_apply_delay = 100min" | tee --append ${PGDATA}/${file}
 
 file=standby.signal
 touch ${PGDATA}/${file}
@@ -282,6 +284,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+sleep 100
 exit
 ```
 EXECUTE TERMINAL IN SLAVE
@@ -301,12 +304,6 @@ docker \
 VIEW SAMPLE TABLE TO CHECK REPLICATION
 ```
 command="SELECT * FROM guestbook;"
-psql \
-    --command "${command}" \
-    --dbname ${dbname} \
-    --username ${username} \
-
-sleep 300
 psql \
     --command "${command}" \
     --dbname ${dbname} \
@@ -336,13 +333,8 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-sleep 10
-date
+sleep 100
 exit
-```
-TAKE NOTE OF THE DATE
-```
-recovery_target_time='HERE PUT THE DATE'
 ```
 EXECUTE TERMINAL IN MASTER
 ```
@@ -366,6 +358,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+sleep 100
 exit
 ```
 STOP THE SLAVE
@@ -400,7 +393,7 @@ CONFIGURE RECOVERY MODE
 ```
 file=postgresql.conf
 echo "recovery_target_action = pause" | tee --append ${PGDATA}/${file}
-echo "recovery_target_inclusive = true" | tee --append ${PGDATA}/${file}
+echo "recovery_target_inclusive = off" | tee --append ${PGDATA}/${file}
 echo "recovery_target_time = '${recovery_target_time}'" | tee --append ${PGDATA}/${file}
 echo "restore_command = 'cp ${mount_archive}/%f %p'" | tee --append ${PGDATA}/${file}
 exit
