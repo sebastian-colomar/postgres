@@ -131,7 +131,6 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-sleep 100
 createuser \
     ${user_replication} \
     --replication \
@@ -284,7 +283,6 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-sleep 100
 exit
 ```
 EXECUTE TERMINAL IN SLAVE
@@ -333,7 +331,6 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-sleep 100
 exit
 ```
 EXECUTE TERMINAL IN MASTER
@@ -358,7 +355,6 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-sleep 100
 exit
 ```
 STOP THE SLAVE
@@ -396,6 +392,8 @@ echo "recovery_target_action = pause" | tee --append ${PGDATA}/${file}
 echo "recovery_target_inclusive = off" | tee --append ${PGDATA}/${file}
 echo "recovery_target_time = '${recovery_target_time}'" | tee --append ${PGDATA}/${file}
 echo "restore_command = 'cp ${mount_archive}/%f %p'" | tee --append ${PGDATA}/${file}
+sed --in-file /^recovery_min_apply_delay/d ${PGDATA}/${file}
+
 exit
 ```
 RESTART SLAVE
