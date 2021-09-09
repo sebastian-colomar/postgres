@@ -192,7 +192,7 @@ CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
 echo "primary_conninfo = 'host=${container_master} port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
-echo "recovery_min_apply_delay = 10min" | tee --append ${PGDATA}/${file}
+echo "recovery_min_apply_delay = 5min" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
@@ -287,7 +287,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-sleep 1000
+sleep 300
 psql \
     --command "${command}" \
     --dbname ${dbname} \
