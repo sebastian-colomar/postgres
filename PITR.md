@@ -68,11 +68,6 @@ volume_var=${container_slave}_var
 docker \
     volume \
     create \
-    ${volume_archive} \
-
-docker \
-    volume \
-    create \
     ${volume_data} \
 
 docker \
