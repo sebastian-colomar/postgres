@@ -16,7 +16,6 @@ user=postgres
 username=postgres
 user_replication=replicator
 
-volume_archive=postgresql_archive
 volume_data=${container_master}_data
 volume_run=${container_master}_run
 volume_var=${container_master}_var
@@ -56,7 +55,6 @@ docker \
     --network ${network} \
     --read-only \
     --restart always \
-    --volume ${volume_archive}:${mount_archive} \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
@@ -89,7 +87,6 @@ docker \
     container \
     exec \
     --env dbname=${dbname} \
-    --env mount_archive=${mount_archive} \
     --env mount_data=${mount_data} \
     --env username=${username} \
     --env user_replication=${user_replication} \
@@ -209,7 +206,6 @@ docker \
     --network ${network} \
     --read-only \
     --restart always \
-    --volume ${volume_archive}:${mount_archive} \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
