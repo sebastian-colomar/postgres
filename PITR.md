@@ -322,6 +322,7 @@ exit
 ```
 TAKE NOTE OF THE DATE AND STOP THE SLAVE
 ```
+recovery_target_time='HERE PUT THE DATE'
 docker \
     container \
     stop \
@@ -358,8 +359,8 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env container_master=${container_master} \
-    --env user_replication=${user_replication} \
+    --env recovery_target_time=${recovery_target_time} \
+    --env mount_archive=${mount_archive} \
     --entrypoint ${entrypoint} \
     --interactive \
     --network ${network} \
@@ -372,12 +373,12 @@ docker \
     ${debian_image} \
 
 ```
-CONFIGURE RECOVERY MODE WITH THE DATE YOU TOOK NOTE BEFORE
+CONFIGURE RECOVERY MODE
 ```
 file=postgresql.conf
 echo "recovery_target_action = pause" | tee --append ${PGDATA}/${file}
 echo "recovery_target_inclusive = false" | tee --append ${PGDATA}/${file}
-echo "recovery_target_time = 'Thu Sep  9 02:19:15 UTC 2021'" | tee --append ${PGDATA}/${file}
+echo "recovery_target_time = '${recovery_target_time}'" | tee --append ${PGDATA}/${file}
 echo "restore_command = 'cp ${mount_archive}/%f %p'" | tee --append ${PGDATA}/${file}
 
 ```
