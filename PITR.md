@@ -98,6 +98,7 @@ docker \
 ASSIGN PERMISSIONS TO ARCHIVE VOLUME
 ```
 chown --recursive postgres.postgres ${mount_archive}
+exit
 ```
 EXECUTE TERMINAL INSIDE MASTER
 ```
