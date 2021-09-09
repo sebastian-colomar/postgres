@@ -69,27 +69,13 @@ docker \
     --interactive \
     --tty \
     ${container} \
-    apt-get update
-
-docker \
-    container \
-    exec \
-    --interactive \
-    --tty \
-    ${container} \
-    apt-get install -y syslog-ng
-
-docker \
-    container \
-    exec \
-    --interactive \
-    --tty \
-    --user ${user} \
-    ${container} \
     ${cmd} \
 
 ```
 ```
+apt-get update && apt-get install -y syslog-ng
+```
+su --login postgres
 command='\l'
 dbname=postgres
 username=postgres
@@ -103,5 +89,4 @@ psql \
 docker container rm --force $( docker container ls --all --quiet )
 docker network rm $( docker network ls --quiet )
 docker volume rm $( docker volume ls --quiet )
-
 ```
