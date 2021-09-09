@@ -6,6 +6,7 @@ container_master=pg-master
 container_slave=pg-slave
 dbname=postgres
 debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
+entrypoint=/bin/bash
 image=academiaonline/postgres:latest
 mount_archive=/var/lib/postgresql/archive
 mount_data=/var/lib/postgresql/data
@@ -16,6 +17,7 @@ user=postgres
 username=postgres
 user_replication=replicator
 
+volume_archive=pg_archive
 volume_data=${container_master}_data
 volume_run=${container_master}_run
 volume_var=${container_master}_var
@@ -55,6 +57,7 @@ docker \
     --network ${network} \
     --read-only \
     --restart always \
+    --volume ${volume_archive}:${mount_archive} \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
@@ -80,9 +83,24 @@ docker \
     ${volume_var} \
 
 ```
+EXECUTE TERMINAL INSIDE MASTER AS ROOT
+```
+docker \
+    container \
+    exec \
+    --env mount_archive=${mount_archive} \
+    --interactive \
+    --tty \
+    ${container_master} \
+    ${entrypoint} \
+
+```
+ASSIGN PERMISSIONS TO ARCHIVE VOLUME
+```
+chown --recursive postgres.postgres ${mount_archive}
+```
 EXECUTE TERMINAL INSIDE MASTER
 ```
-cmd=/bin/bash
 docker \
     container \
     exec \
@@ -94,7 +112,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_master} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 CREATE SAMPLE TABLE AND CONFIGURE REPLICATION AND WAL ARCHIVING
@@ -133,7 +151,6 @@ docker \
     restart \
     ${container_master} \
 
-entrypoint=/bin/bash
 docker \
     container \
     run \
@@ -248,7 +265,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_master} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 INSERT NEW SAMPLE ROW
@@ -272,7 +289,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_slave} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 VIEW SAMPLE TABLE TO CHECK REPLICATION
@@ -302,7 +319,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_master} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 INSERT A NEW ROW IN THE SAMPLE TABLE
@@ -336,7 +353,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_master} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 INSERT YET A NEW ROW IN THE SAMPLE TABLE
@@ -397,7 +414,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_slave} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 VIEW SAMPLE TABLE TO CHECK PITR
@@ -429,7 +446,7 @@ docker \
     --tty \
     --user ${user} \
     ${container_slave} \
-    ${cmd} \
+    ${entrypoint} \
 
 ```
 RESUME RECOVERY AND PROMOTE SLAVE
