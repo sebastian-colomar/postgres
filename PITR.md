@@ -344,14 +344,6 @@ TAKE NOTE OF THE DATE
 ```
 recovery_target_time='HERE PUT THE DATE'
 ```
-STOP THE SLAVE
-```
-docker \
-    container \
-    stop \
-    ${container_slave} \
-
-```
 EXECUTE TERMINAL IN MASTER
 ```
 docker \
@@ -375,6 +367,14 @@ psql \
     --username ${username} \
 
 exit
+```
+STOP THE SLAVE
+```
+docker \
+    container \
+    stop \
+    ${container_slave} \
+
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
