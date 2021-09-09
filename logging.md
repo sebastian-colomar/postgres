@@ -53,6 +53,7 @@ docker \
     --network ${network} \
     --restart always \
     --volume ${volume_data}:${mount_data} \
+    --volume ${volume_logs}:${mount_logs} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
@@ -66,6 +67,7 @@ while true
 docker \
     container \
     exec \
+    --env mount_logs=${mount_logs} \
     --interactive \
     --tty \
     ${container} \
@@ -73,10 +75,11 @@ docker \
 
 ```
 ```
+chown postgres:postgres --recursive ${mount_logs}
 apt-get update && apt-get install -y syslog-ng
-```
-```
 su --login postgres
+```
+```
 command='\l'
 dbname=postgres
 username=postgres
