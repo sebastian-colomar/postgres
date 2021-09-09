@@ -6,20 +6,14 @@ POSTGRES_PASSWORD=mysecretpassword
 
 container=postgres
 image=academiaonline/postgres:latest
-mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
 sleep=3
 user=postgres
-volume_data=postgres_data
 volume_run=postgres_run
 volume_var=postgres_var
 
-docker \
-    volume \
-    create \
-    ${volume_data}
 docker \
     volume \
     create \
