@@ -300,7 +300,8 @@ EXECUTE TERMINAL IN MASTER
 docker \
     container \
     exec \
-    --env PGDATA=${PGDATA} \
+    --env dbname=${dbname} \
+    --env username=${username} \
     --interactive \
     --tty \
     --user ${user} \
