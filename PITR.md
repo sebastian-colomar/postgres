@@ -99,15 +99,7 @@ docker \
     ${cmd} \
 
 ```
-SET UP WAL ARCHIVING
-```
-file=postgresql.conf
-echo "archive_command = 'test ! -f ${mount_archive}/%f && cp %p ${mount_archive}/%f'" | tee --append ${PGDATA}/${file}
-echo "archive_mode = on" | tee --append ${PGDATA}/${file}
-echo "archive_timeout = 100" | tee --append ${PGDATA}/${file}
-exit
-```
-CREATE SAMPLE TABLE AND CONFIGURE REPLICATION
+CREATE SAMPLE TABLE AND CONFIGURE REPLICATION AND WAL ARCHIVING
 ```
 command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
 psql \
@@ -128,6 +120,12 @@ createuser \
 
 file=pg_hba.conf
 echo "host replication ${user_replication} samenet trust" | tee --append ${PGDATA}/${file}
+
+file=postgresql.conf
+echo "archive_command = 'test ! -f ${mount_archive}/%f && cp %p ${mount_archive}/%f'" | tee --append ${PGDATA}/${file}
+echo "archive_mode = on" | tee --append ${PGDATA}/${file}
+echo "archive_timeout = 100" | tee --append ${PGDATA}/${file}
+
 exit
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
