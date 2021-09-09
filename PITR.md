@@ -209,7 +209,10 @@ CONFIGURE STREAMING REPLICATION IN SLAVE
 file=postgresql.conf
 echo "primary_conninfo = 'host=${container_master} port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
 echo "recovery_min_apply_delay = 5min" | tee --append ${PGDATA}/${file}
-touch ${PGDATA}/standby.signal
+
+file=standby.signal
+touch ${PGDATA}/${file}
+chmod +w ${PGDATA}/${file}
 
 exit
 ```
@@ -333,12 +336,16 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+sleep 10
 date
 exit
 ```
-TAKE NOTE OF THE DATE AND STOP THE SLAVE
+TAKE NOTE OF THE DATE
 ```
 recovery_target_time='HERE PUT THE DATE'
+```
+STOP THE SLAVE
+```
 docker \
     container \
     stop \
@@ -393,7 +400,7 @@ CONFIGURE RECOVERY MODE
 ```
 file=postgresql.conf
 echo "recovery_target_action = pause" | tee --append ${PGDATA}/${file}
-echo "recovery_target_inclusive = false" | tee --append ${PGDATA}/${file}
+echo "recovery_target_inclusive = true" | tee --append ${PGDATA}/${file}
 echo "recovery_target_time = '${recovery_target_time}'" | tee --append ${PGDATA}/${file}
 echo "restore_command = 'cp ${mount_archive}/%f %p'" | tee --append ${PGDATA}/${file}
 exit
