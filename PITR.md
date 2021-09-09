@@ -224,6 +224,7 @@ docker \
     --network ${network} \
     --read-only \
     --restart always \
+    --volume ${volume_archive}:${mount_archive} \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
