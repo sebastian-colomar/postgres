@@ -106,6 +106,7 @@ docker \
     container \
     exec \
     --env dbname=${dbname} \
+    --env mount_archive=${mount_archive} \
     --env mount_data=${mount_data} \
     --env username=${username} \
     --env user_replication=${user_replication} \
