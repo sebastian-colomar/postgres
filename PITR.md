@@ -5,8 +5,9 @@ POSTGRES_PASSWORD=mysecretpassword
 container_master=pg-master
 container_slave=pg-slave
 dbname=postgres
+debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 image=academiaonline/postgres:latest
-mount_archive=/opt/postgresql/archive
+mount_archive=/var/lib/postgresql/archive
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
@@ -169,7 +170,6 @@ exit
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
-debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 docker \
     container \
     run \
@@ -287,6 +287,12 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
+sleep 1000
+psql \
+    --command "${command}" \
+    --dbname ${dbname} \
+    --username ${username} \
+
 exit
 ```
 EXECUTE TERMINAL IN MASTER
@@ -302,18 +308,23 @@ docker \
     ${cmd} \
 
 ```
-DEMOTE MASTER
+INSERT A NEW ROW IN THE SAMPLE TABLE
 ```
-touch ${PGDATA}/standby.signal
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
+psql \
+    --command "${command}" \
+    --dbname ${dbname} \
+    --username ${username} \
 
+date
 exit
 ```
-RESTART MASTER
+TAKE NOTE OF THE DATE AND STOP THE SLAVE
 ```
 docker \
     container \
-    restart \
-    ${container_master} \
+    stop \
+    ${container_slave} \
 
 ```
 EXECUTE TERMINAL IN MASTER
@@ -330,15 +341,52 @@ docker \
     ${cmd} \
 
 ```
-TRY TO WRITE IN DEMOTED MASTER
+INSERT YET A NEW ROW IN THE SAMPLE TABLE
  ```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN and AGAIN replicating.');"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
     --username ${username} \
 
 exit
+```
+RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
+```
+docker \
+    container \
+    run \
+    --env PGDATA=${PGDATA} \
+    --env container_master=${container_master} \
+    --env user_replication=${user_replication} \
+    --entrypoint ${entrypoint} \
+    --interactive \
+    --network ${network} \
+    --read-only \
+    --rm \
+    --tty \
+    --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
+    ${debian_image} \
+
+```
+CONFIGURE RECOVERY MODE WITH THE DATE YOU TOOK NOTE BEFORE
+```
+file=postgresql.conf
+echo "recovery_target_action = pause" | tee --append ${PGDATA}/${file}
+echo "recovery_target_inclusive = false" | tee --append ${PGDATA}/${file}
+echo "recovery_target_time = 'Thu Sep  9 02:19:15 UTC 2021'" | tee --append ${PGDATA}/${file}
+echo "restore_command = 'cp ${mount_archive}/%f %p'" | tee --append ${PGDATA}/${file}
+
+```
+RESTART SLAVE
+```
+docker \
+    container \
+    restart \
+    ${container_slave} \
+
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
@@ -354,30 +402,7 @@ docker \
     ${cmd} \
 
 ```
-TRY TO WRITE
-```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
-psql \
-    --command "${command}" \
-    --dbname ${dbname} \
-    --username ${username} \
-
-```
-PROMOTE SLAVE
-```
-pg_ctl promote
-
-```
-TRY AGAIN TO WRITE
-```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
-psql \
-    --command "${command}" \
-    --dbname ${dbname} \
-    --username ${username} \
-
-```
-VIEW SAMPLE TABLE TO CHECK NEW MASTER
+VIEW SAMPLE TABLE TO CHECK PITR
 ```
 command="SELECT * FROM guestbook;"
 psql \
@@ -387,6 +412,39 @@ psql \
 
 exit
 ```
+STOP MASTER
+```
+docker \
+    container \
+    stop \
+    ${container_master} \
+
+```
+EXECUTE TERMINAL IN SLAVE
+```
+docker \
+    container \
+    exec \
+    --env dbname=${dbname} \
+    --env username=${username} \
+    --interactive \
+    --tty \
+    --user ${user} \
+    ${container_slave} \
+    ${cmd} \
+
+```
+RESUME RECOVERY AND PROMOTE SLAVE
+```
+command="SELECT pg_wal_replay_resume();"
+psql \
+    --command "${command}" \
+    --dbname ${dbname} \
+    --username ${username} \
+
+pg_ctl promote
+exit
+```
 TO DO: CONFIGURE OLD MASTER TO LISTEN TO NEW MASTER
 
 CLEAN UP
@@ -394,5 +452,4 @@ CLEAN UP
 docker container rm --force $( docker container ls --all --quiet )
 docker network rm $( docker network ls --quiet )
 docker volume rm $( docker volume ls --quiet )
-
 ```
