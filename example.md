@@ -4,7 +4,9 @@ PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
 container=postgres
-image=academiaonline/postgres:latest
+image_repository=academiaonline/postgres
+image_tag=:12.8-buster
+image_digest=@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e40698375b
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
@@ -39,7 +41,7 @@ docker \
     --restart always \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
-    ${image} \
+    ${image_repository}${image_tag}${image_digest} \
 
 while true
     do
