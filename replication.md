@@ -92,7 +92,7 @@ docker \
 ```
 CREATE SAMPLE TABLE AND CONFIGURE REPLICATION
 ```
-command="CREATE TABLE guestbook (visitor_email text, vistor_id serial, date timestamp, message text);"
+command="CREATE TABLE guestbook (visitor_email text, visitor_id serial, date timestamp, message text);"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
