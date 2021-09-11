@@ -3,6 +3,7 @@
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
+cmd=/bin/bash
 container=postgres
 image_repository=academiaonline/postgres
 image_tag=:12.8-buster
@@ -10,7 +11,6 @@ image_digest=@sha256:26402c048be52bdd109b55b2df66bd73ae59487ebfc209959464c4e4069
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
-sleep=3
 user=postgres
 volume_run=postgres_run
 volume_var=postgres_var
@@ -19,6 +19,7 @@ docker \
     volume \
     create \
     ${volume_run}
+
 docker \
     volume \
     create \
@@ -45,11 +46,10 @@ docker \
 
 while true
     do
-        sleep ${sleep}
+        sleep 3
         docker container ls | grep Up.*${container} && break
     done
 
-cmd='/bin/bash'
 docker \
     container \
     exec \
