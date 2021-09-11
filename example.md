@@ -6,12 +6,19 @@ POSTGRES_PASSWORD=mysecretpassword
 cmd=/bin/bash
 container=postgres
 image_repository=academiaonline/postgres
+mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=postgres
 user=postgres
+volume_data=postgres_data
 volume_run=postgres_run
 volume_var=postgres_var
+
+docker \
+    volume \
+    create \
+    ${volume_data}
 
 docker \
     volume \
@@ -38,6 +45,7 @@ docker \
     --network ${network} \
     --read-only \
     --restart always \
+    --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image_repository} \
