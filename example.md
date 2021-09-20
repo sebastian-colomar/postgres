@@ -55,7 +55,8 @@ while true
         sleep 3
         docker container ls | grep Up.*${container} && break
     done
-
+```
+```
 docker \
     container \
     exec \
