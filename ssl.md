@@ -1,20 +1,18 @@
 ```
 cd
-mkdir ssl
-
-mkdir ca
+mkdir --parents ssl/ca
 openssl req -new -nodes -text -out ssl/ca/root.csr -keyout ssl/ca/root.key -subj "/CN=root.yourdomain.com"
 chmod og-rwx ssl/ca/root.key
 openssl x509 -req -in ssl/ca/root.csr -text -days 3650 -extfile /etc/ssl/openssl.cnf -extensions v3_ca -signkey ssl/ca/root.key -out ssl/ca/root.crt
 
-mkdir server
+mkdir --parents ssl/server
 openssl req -new -nodes -text -out ssl/server/server.csr -keyout ssl/server/server.key -subj "/CN=dbhost.yourdomain.com"
 chmod og-rwx ssl/server/server.key
 openssl x509 -req -in ssl/server/server.csr -text -days 365 -CA ssl/ca/root.crt -CAkey ssl/ca/root.key -CAcreateserial -out ssl/server/server.crt
 cat ssl/ca/root.srl >> ssl/ca/list.srl
 openssl dhparam -out ssl/server/dhparams.pem 2048
 
-mkdir client
+mkdir --parents ssl/client
 #openssl req -new -nodes -text -out ssl/client/testssl.csr -keyout ssl/client/testssl.key -subj "/CN=testssl"
 openssl req -new -text -out ssl/client/testssl.csr -keyout ssl/client/testssl.key -subj "/CN=testssl"
 chmod og-rwx ssl/client/testssl.key
