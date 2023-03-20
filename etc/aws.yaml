@@ -148,7 +148,8 @@ Parameters:
 #    Default: 'ami-0db0b3ab7df22e366' #MUMBAI #UBUNTU18
 #    Default: 'ami-026f33d38b6410e30' #MUMBAI #CENTOS7
 #    Default: 'ami-003b12a9a1ee83922' #MUMBAI #RHEL7
-    Default: 'ami-0a9d27a9f4f5c0efc' #MUMBAI #RHEL8
+#    Default: 'ami-0a9d27a9f4f5c0efc' #MUMBAI #RHEL8
+    Default: ami-05afd67c4a44cc983 #MUMBAI AMAZON
     Description: >
       Select AMI to use for the Cluster Master instances. 
       When it's left blank, the default AMI for your AWS region will be used. 
@@ -165,7 +166,8 @@ Parameters:
 #    Default: 'ami-0db0b3ab7df22e366' #MUMBAI #UBUNTU18
 #    Default: 'ami-026f33d38b6410e30' #MUMBAI #CENTOS7
 #    Default: 'ami-003b12a9a1ee83922' #MUMBAI #RHEL7
-    Default: 'ami-0a9d27a9f4f5c0efc' #MUMBAI #RHEL8
+#    Default: 'ami-0a9d27a9f4f5c0efc' #MUMBAI #RHEL8
+    Default: ami-05afd67c4a44cc983 #MUMBAI AMAZON
     Description: >
       Select AMI to use for the Cluster Worker instances. 
       When it's left blank, the default AMI for your AWS region will be used. 
@@ -318,7 +320,7 @@ Resources:
   InstanceMaster1:
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
-      #ImageId: !Ref InstanceMasterImageId
+      ImageId: !Ref InstanceMasterImageId
       InstanceType: !Ref InstanceMasterInstanceType
       PrivateIpAddress: !Ref PrivateIpAddressInstanceMaster1
       SecurityGroupIds:
@@ -344,7 +346,7 @@ Resources:
     DependsOn: [VPCGatewayAttachment]  
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
-      #ImageId: !Ref InstanceWorkerImageId
+      ImageId: !Ref InstanceWorkerImageId
       InstanceType: !Ref InstanceWorkerInstanceType
       SecurityGroupIds:
         - !GetAtt VPC.DefaultSecurityGroup
