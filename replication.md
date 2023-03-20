@@ -3,8 +3,6 @@ ON BOTH MASTER AND SLAVE INSTANCES
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
-container_master=pg-master
-container_slave=pg-slave
 dbname=postgres
 host=10.168.2.100
 image=academiaonline/postgres:latest
@@ -20,11 +18,12 @@ username=postgres
 user_replication=replicator
 
 ```
-ON THE MASTER INSTANCE
+ON THE MASTER INSTANCE:
 ```
-volume_data=${container_master}_data
-volume_run=${container_master}_run
-volume_var=${container_master}_var
+container=pg-master
+volume_data=${container}_data
+volume_run=${container}_run
+volume_var=${container}_var
 
 docker \
     network \
@@ -52,7 +51,7 @@ docker \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --name ${container_master} \
+    --name ${container} \
     --network ${network} \
     --publish ${port}:${port}/${protocol} \
     --read-only \
@@ -63,7 +62,6 @@ docker \
     ${image} \
     
 ```
-EXECUTE TERMINAL INSIDE MASTER
 ```
 cmd=/bin/bash
 docker \
@@ -77,11 +75,10 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_master} \
+    ${container} \
     ${cmd} \
 
 ```
-CREATE SAMPLE TABLE AND CONFIGURE REPLICATION
 ```
 command="CREATE TABLE guestbook (visitor_email text, visitor_id serial, date timestamp, message text);"
 psql \
@@ -110,14 +107,15 @@ exit
 docker \
     container \
     restart \
-    ${container_master} \
+    ${container} \
 
 ```
-ON THE SLAVE INSTANCE
+ON THE SLAVE INSTANCE:
 ```
-volume_data=${container_slave}_data
-volume_run=${container_slave}_run
-volume_var=${container_slave}_var
+container=pg-slave
+volume_data=${container}_data
+volume_run=${container}_run
+volume_var=${container}_var
 
 docker \
     network \
@@ -140,7 +138,6 @@ docker \
     ${volume_var} \
 
 ```
-RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
 entrypoint=/bin/bash
 docker \
@@ -162,7 +159,6 @@ docker \
     ${image} \
 
 ```
-RUN BASE BACKUP
 ```
 pg_basebackup \
     --host ${host} \
@@ -175,7 +171,6 @@ pg_basebackup \
 exit
 
 ```
-RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
 debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 docker \
@@ -197,7 +192,6 @@ docker \
     ${debian_image} \
 
 ```
-CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
 echo "primary_conninfo = 'host=${host} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
@@ -206,7 +200,6 @@ touch ${PGDATA}/standby.signal
 exit
 
 ```
-START SLAVE
 ```
 docker \
     container \
@@ -214,7 +207,7 @@ docker \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-    --name ${container_slave} \
+    --name ${container} \
     --network ${network} \
     --publish ${port}:${port}/${protocol} \
     --read-only \
@@ -225,7 +218,6 @@ docker \
     ${image} \
     
 ```
-EXECUTE TERMINAL IN SLAVE
 ```
 cmd=/bin/bash
 docker \
@@ -236,11 +228,10 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_slave} \
+    ${container} \
     ${cmd} \
 
 ```
-VIEW SAMPLE TABLE
 ```
 command="SELECT * FROM guestbook;"
 psql \
@@ -251,7 +242,7 @@ psql \
 exit
 
 ```
-EXECUTE TERMINAL IN MASTER
+ON THE MASTER INSTANCE:
 ```
 docker \
     container \
@@ -261,11 +252,10 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_master} \
+    ${container} \
     ${cmd} \
 
 ```
-INSERT NEW SAMPLE ROW
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are replicating.');"
 psql \
@@ -276,7 +266,7 @@ psql \
 exit
 
 ```
-EXECUTE TERMINAL IN SLAVE
+ON THE SLAVE INSTANCE:
 ```
 docker \
     container \
@@ -286,11 +276,10 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_slave} \
+    ${container} \
     ${cmd} \
 
 ```
-VIEW SAMPLE TABLE TO CHECK REPLICATION
 ```
 command="SELECT * FROM guestbook;"
 psql \
@@ -301,7 +290,7 @@ psql \
 exit
 
 ```
-EXECUTE TERMINAL IN MASTER
+ON THE MASTER INSTANCE:
 ```
 docker \
     container \
@@ -310,26 +299,23 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_master} \
+    ${container} \
     ${cmd} \
 
 ```
-DEMOTE MASTER
 ```
 touch ${PGDATA}/standby.signal
 
 exit
 
 ```
-RESTART MASTER
 ```
 docker \
     container \
     restart \
-    ${container_master} \
+    ${container} \
 
 ```
-EXECUTE TERMINAL IN MASTER
 ```
 docker \
     container \
@@ -339,12 +325,11 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_master} \
+    ${container} \
     ${cmd} \
 
 ```
-TRY TO WRITE IN DEMOTED MASTER
- ```
+```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
 psql \
     --command "${command}" \
@@ -354,7 +339,7 @@ psql \
 exit
 
 ```
-EXECUTE TERMINAL IN SLAVE
+ON THE SLAVE INSTANCE:
 ```
 docker \
     container \
@@ -364,11 +349,10 @@ docker \
     --interactive \
     --tty \
     --user ${user} \
-    ${container_slave} \
+    ${container} \
     ${cmd} \
 
 ```
-TRY TO WRITE
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
 psql \
@@ -377,12 +361,10 @@ psql \
     --username ${username} \
 
 ```
-PROMOTE SLAVE
 ```
 pg_ctl promote
 
 ```
-TRY AGAIN TO WRITE
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
 psql \
@@ -391,7 +373,6 @@ psql \
     --username ${username} \
 
 ```
-VIEW SAMPLE TABLE TO CHECK NEW MASTER
 ```
 command="SELECT * FROM guestbook;"
 psql \
@@ -402,8 +383,67 @@ psql \
 exit
 
 ```
-TO DO: CONFIGURE OLD MASTER TO LISTEN TO NEW MASTER
+ON THE MASTER INSTANCE:
+```
+debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
+host=10.168.2.210
+docker \
+    container \
+    run \
+    --env PGDATA=${PGDATA} \
+    --env host=${host} \
+    --env port=${port} \
+    --env user_replication=${user_replication} \
+    --entrypoint ${entrypoint} \
+    --interactive \
+    --network ${network} \
+    --read-only \
+    --rm \
+    --tty \
+    --volume ${volume_data}:${mount_data} \
+    --volume ${volume_run}:${mount_run} \
+    --volume ${volume_var}:${mount_var} \
+    ${debian_image} \
 
+```
+```
+file=postgresql.conf
+echo "primary_conninfo = 'host=${host} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
+touch ${PGDATA}/standby.signal
+
+exit
+
+```
+```
+docker \
+    container \
+    restart \
+    ${container} \
+
+```
+```
+docker \
+    container \
+    exec \
+    --env dbname=${dbname} \
+    --env username=${username} \
+    --interactive \
+    --tty \
+    --user ${user} \
+    ${container} \
+    ${cmd} \
+
+```
+```
+command="SELECT * FROM guestbook;"
+psql \
+    --command "${command}" \
+    --dbname ${dbname} \
+    --username ${username} \
+
+exit
+
+```
 CLEAN UP
 ```
 docker container rm --force $( docker container ls --all --quiet )
