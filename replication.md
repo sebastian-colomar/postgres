@@ -71,6 +71,7 @@ docker \
     exec \
     --env dbname=${dbname} \
     --env mount_data=${mount_data} \
+    --env samenet=${samenet} \
     --env username=${username} \
     --env user_replication=${user_replication} \
     --interactive \
@@ -144,7 +145,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env container_master=${container_master} \
+    --env host=${host} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
@@ -179,7 +180,8 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env container_master=${container_master} \
+    --env host=${host} \
+    --env port=${port} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
@@ -196,7 +198,7 @@ docker \
 CONFIGURE STREAMING REPLICATION IN SLAVE
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=${container_master} port=5432 user=${user_replication}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${host} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
