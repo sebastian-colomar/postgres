@@ -83,7 +83,7 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ( 'jim@gmail.com', current_date, 'This is a test.');"
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ( 'jim@gmail.com', current_date, 'Test 1.');"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
@@ -243,7 +243,7 @@ docker \
     ${cmd} \
 ```
 ```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are replicating.');"
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 2.');"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
@@ -309,7 +309,7 @@ docker \
     ${cmd} \
 ```
 ```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 3.');"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
@@ -331,7 +331,7 @@ docker \
     ${cmd} \
 ```
 ```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 4.');"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
@@ -341,7 +341,7 @@ psql \
 pg_ctl promote
 ```
 ```
-command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Now we are AGAIN replicating.');"
+command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 5.');"
 psql \
     --command "${command}" \
     --dbname ${dbname} \
