@@ -1,0 +1,526 @@
+#########################################################################
+#      Copyright (C) 2023        Sebastian Francisco Colomar Bauza      #
+#      SPDX-License-Identifier:  GPL-2.0-only                           #
+#########################################################################
+
+---
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: This template creates a new VPC and deploys 2 ec2 instances in AWS
+
+#============================================================
+# UI Definition
+#============================================================
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Cluster Common Configuration
+        Parameters:
+          - BranchAWS
+          - NodeInstallUrlPath
+          - NodeInstallUrlFileMaster
+          - NodeInstallUrlFileWorker
+      -
+        Label:
+          default: Cluster Master Configuration
+        Parameters:
+          - InstanceMasterImageId
+          - InstanceMasterInstanceType
+      -
+        Label:
+          default: Cluster Worker Configuration
+        Parameters:
+          - InstanceWorkerImageId
+          - InstanceWorkerInstanceType
+      -
+        Label:
+          default: Network Configuration
+        Parameters:
+          - HostedZoneName
+          - HttpCodeTargetGroupMaster
+          - HttpCodeTargetGroupWorker
+          - IpProtocolListenerMaster
+          - IpProtocolListenerWorker
+          - PortListenerMaster
+          - PortListenerWorker
+          - PortTargetGroupMaster
+          - PortTargetGroupWorker
+          - PrivateIpAddressInstanceMaster1
+          - PrivateIpAddressInstanceMaster2
+          - PrivateIpAddressInstanceMaster3
+          - ProtocolListenerMaster
+          - ProtocolListenerWorker
+          - ProtocolTargetGroupMaster
+          - ProtocolTargetGroupWorker
+          - RecordSetNameWorker
+          - SecurityGroupCidrIpMaster
+          - SecurityGroupCidrIpWorker
+          - SubnetCidrBlockPublic1
+          - SubnetCidrBlockPublic2
+          - SubnetCidrBlockPublic3
+          - VPCCidrBlock
+      -
+        Label:
+          default: Security
+        Parameters:
+          - Identifier
+          
+    ParameterLabels:
+      BranchAWS:
+        default: The branch of the git repo to download the script for the common install of the nodes
+      HostedZoneName:
+        default: The name of the hosted zone that you want to create records in
+      Identifier:
+        default: The Identifier of the certificate you want to use
+      InstanceMasterImageId:
+        default: AMI to use for Cluster Master Instances
+      InstanceMasterInstanceType:
+        default: Cluster Master Instance Size
+      InstanceWorkerImageId:
+        default: AMI to use for Cluster Worker Instances
+      InstanceWorkerInstanceType:
+        default: Cluster Worker Instance Size
+      IpProtocolListenerMaster:
+        default: The IP protocol for Listener Master
+      IpProtocolListenerWorker:
+        default: The IP protocol for Listener Worker
+      HttpCodeTargetGroupMaster:
+        default: The HTTP codes to use when checking for a successful response from Master Group
+      HttpCodeTargetGroupWorker:
+        default: The HTTP codes to use when checking for a successful response from Worker Group
+      NodeInstallUrlPath:
+        default: The URL path to download the script for the common install of the nodes
+      NodeInstallUrlFileMaster:
+        default: The name of the script for the common install of the Master nodes
+      NodeInstallUrlFileWorker:
+        default: The name of the script for the common install of the Worker nodes
+      PortListenerMaster:
+        default: The listening port for Listener Master
+      PortListenerWorker:
+        default: The listening port for Listener Worker
+      PortTargetGroupMaster:
+        default: The internal listening port for Target Group Master
+      PortTargetGroupWorker:
+        default: The internal listening port for Target Group Worker
+      PrivateIpAddressInstanceMaster1:
+        default: The private IP address for Master 1
+      PrivateIpAddressInstanceMaster2:
+        default: The private IP address for Master 2
+      PrivateIpAddressInstanceMaster3:
+        default: The private IP address for Master 3
+      ProtocolListenerMaster:
+        default: The protocol for Listener Master
+      ProtocolListenerWorker:
+        default: The protocol for Listener Worker
+      ProtocolTargetGroupMaster:
+        default: The internal protocol for Target Group Master
+      ProtocolTargetGroupWorker:
+        default: The internal protocol for Target Group Worker
+      RecordSetNameWorker:
+        default: The name of the Record Set for Worker service
+      SecurityGroupCidrIpMaster:
+        default: Allowed CIDR for ALB Cluster Master Access
+      SecurityGroupCidrIpWorker:
+        default: Allowed CIDR for ALB Cluster Worker Access
+      SubnetCidrBlockPublic1:
+        default: Public Subnet 1 CIDR
+      SubnetCidrBlockPublic2:
+        default: Public Subnet 2 CIDR
+      SubnetCidrBlockPublic3:
+        default: Public Subnet 3 CIDR
+      VPCCidrBlock:
+        default: VPC CIDR
+                
+Parameters:
+
+  BranchAWS:
+    Default: "main"
+    Description: >
+      The branch of the git repo to download the script for the common install of the nodes.
+    Type: String
+    
+  HostedZoneName:
+#    Default: 'sebastian-colomar.es'
+    Default: 'sebastian-colomar.com'
+    Description: >
+      The name of the hosted zone that you want to create records in.
+    Type: String
+
+  Identifier:
+#    Default: '31ea6050-d1a0-4e91-a37b-ed862904188c' #IRELAND #sebastian-colomar.com
+    Default: 'c3f3310b-f4ed-4874-8849-bd5c2cfe001f' #MUMBAI #sebastian-colomar.com
+    Description: >
+      The Identifier of the certificate you want to use.
+    Type: String
+
+  InstanceMasterImageId:
+#    Default: 'ami-0db0b3ab7df22e366' #MUMBAI #UBUNTU18
+#    Default: 'ami-026f33d38b6410e30' #MUMBAI #CENTOS7
+#    Default: 'ami-003b12a9a1ee83922' #MUMBAI #RHEL7
+    Default: 'ami-0a9d27a9f4f5c0efc' #MUMBAI #RHEL8
+    Description: >
+      Select AMI to use for the Cluster Master instances. 
+      When it's left blank, the default AMI for your AWS region will be used. 
+      When setting an AMI, it must be available in your current region.
+    Type: String
+    
+  InstanceMasterInstanceType:
+    Default: 't2.micro'
+    Description: >
+      Select Amazon EC2 instance type for the Cluster Master instances.
+    Type: String
+    
+  InstanceWorkerImageId:
+#    Default: 'ami-0db0b3ab7df22e366' #MUMBAI #UBUNTU18
+#    Default: 'ami-026f33d38b6410e30' #MUMBAI #CENTOS7
+#    Default: 'ami-003b12a9a1ee83922' #MUMBAI #RHEL7
+    Default: 'ami-0a9d27a9f4f5c0efc' #MUMBAI #RHEL8
+    Description: >
+      Select AMI to use for the Cluster Worker instances. 
+      When it's left blank, the default AMI for your AWS region will be used. 
+      When setting an AMI, it must be available in your current region.
+    Type: String
+    
+  InstanceWorkerInstanceType:
+    Default: 't2.micro'
+    Description: >
+      Select Amazon EC2 instance type for the Cluster Worker instances.
+    Type: String
+    
+  IpProtocolListenerMaster:
+    Default: tcp
+    Description: >
+      The IP protocol for Listener Master.
+    Type: String
+    
+  IpProtocolListenerWorker:
+    Default: tcp
+    Description: >
+      The IP protocol for Listener Worker.
+    Type: String
+    
+  HttpCodeTargetGroupMaster:
+    Default: "200-399"
+    Description: >
+      The HTTP codes to use when checking for a successful response from Master Group.
+    Type: String
+    
+  HttpCodeTargetGroupWorker:
+    Default: "200-399"
+    Description: >
+      The HTTP codes to use when checking for a successful response from Worker Group.
+    Type: String
+    
+  NodeInstallUrlPath:
+    Default: "https://github.com/academiaonline-org/postgres"
+    Description: >
+      The URL path to download the script for the common install of the nodes.
+    Type: String
+    
+  NodeInstallUrlFileMaster:
+    Default: bin/install-ssm-rhel.sh
+    Description: >
+      The name of the script for the common install of the Master nodes.
+    Type: String
+    
+  NodeInstallUrlFileWorker:
+    Default: bin/install-ssm-rhel.sh
+    Description: >
+      The name of the script for the common install of the Worker nodes.
+    Type: String
+    
+  PortListenerMaster:
+    Default: 443
+    Description: >
+      The listening port for Listener Master.
+    Type: Number
+    
+  PortListenerWorker:
+    Default: 443
+    Description: >
+      The listening port for Listener Worker.
+    Type: Number
+    
+  PortTargetGroupMaster:
+    Default: 30000
+    Description: >
+      The internal listening port for Target Group Master.
+    Type: Number
+    
+  PortTargetGroupWorker:
+    Default: 30000
+    Description: >
+      The internal listening port for Target Group Worker.
+    Type: Number
+    
+  PrivateIpAddressInstanceMaster1:
+    Default: 10.168.2.100
+    Description: >
+      The private IP address for Master 1.
+    Type: String
+    
+  ProtocolListenerMaster:
+    Default: HTTPS
+    Description: >
+      The protocol for Listener Master.
+    Type: String
+    
+  ProtocolListenerWorker:
+    Default: HTTPS
+    Description: >
+      The protocol for Listener Worker.
+    Type: String
+    
+  ProtocolTargetGroupMaster:
+    Default: HTTP
+    Description: >
+      The internal protocol for Target Group Master.
+    Type: String
+
+  ProtocolTargetGroupWorker:
+    Default: HTTP
+    Description: >
+      The internal protocol for Target Group Worker.
+    Type: String
+
+  RecordSetNameWorker:
+    Default: myapp-worker
+    Description: >
+      The name of the Record Set for service.
+      It needs to be unique in the sub-domain.
+    Type: String
+  
+  SecurityGroupCidrIpMaster:
+    Default: 0.0.0.0/0
+    Description: >
+      Allowed CIDR block for external web access to the Cluster Master Load Balancer. 
+      It defines the block of IPs that can access the Cluster Master Load Balancer and, consequently, the application servers. 
+      Set it to 0.0.0.0/0 to make it accessible from anywhere.
+    Type: String
+    
+  SecurityGroupCidrIpWorker:
+    Default: 0.0.0.0/0
+    Description: >
+      Allowed CIDR block for external web access to the Cluster Worker Load Balancer. 
+      It defines the block of IPs that can access the Cluster Worker Load Balancer and, consequently, the application servers. 
+      Set it to 0.0.0.0/0 to make it accessible from anywhere.
+    Type: String
+    
+  SubnetCidrBlockPublic1:
+    Default: 10.168.2.0/24
+    Description: >
+      CIDR block for public (DMZ) subnet located in Availability Zone 1. 
+      All resources located on this subnet are provided an IP within this address block. 
+    Type: String
+    
+  VPCCidrBlock:
+    Default: 10.168.0.0/16
+    Description: >
+      CIDR block for the VPC. All the subnets and resources will have an IP within this address block.
+    Type: String
+    
+#============================================================
+# Resources
+#============================================================
+Resources:
+
+  EIPMaster1:
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref InstanceMaster1
+    Type: AWS::EC2::EIP
+
+  EIPWorker1:
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref InstanceWorker1
+    Type: AWS::EC2::EIP
+
+  InstanceMaster1:
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceMasterImageId
+      InstanceType: !Ref InstanceMasterInstanceType
+      PrivateIpAddress: !Ref PrivateIpAddressInstanceMaster1
+      SecurityGroupIds:
+        - !GetAtt VPC.DefaultSecurityGroup
+      SubnetId: !Ref SubnetPublic1
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/sh
+            sudo yum install -y git
+            git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
+            chmod +x GitRepository/${NodeInstallUrlFileMaster}
+            ./GitRepository/${NodeInstallUrlFileMaster}
+            rm --force --recursive GitRepository
+    Type: AWS::EC2::Instance
+            
+  InstanceProfile:
+    Properties:
+      Roles: [!Ref Role]
+    Type: AWS::IAM::InstanceProfile
+
+  InstanceWorker1:
+    DependsOn: [VPCGatewayAttachment]  
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref InstanceWorkerImageId
+      InstanceType: !Ref InstanceWorkerInstanceType
+      SecurityGroupIds:
+        - !GetAtt VPC.DefaultSecurityGroup
+      SubnetId: !Ref SubnetPublic1
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/sh
+            sudo yum install -y git
+            git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
+            chmod +x GitRepository/${NodeInstallUrlFileMaster}
+            ./GitRepository/${NodeInstallUrlFileMaster}
+            rm --force --recursive GitRepository
+    Type: AWS::EC2::Instance
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  ListenerWorker:
+    Properties: 
+      Certificates:
+        - CertificateArn: !Sub 'arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/${Identifier}'
+      DefaultActions: 
+        - ForwardConfig:
+            TargetGroups:
+            - TargetGroupArn: !Ref TargetGroupWorker
+              Weight: 1
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancerWorker
+      Port: !Ref PortListenerWorker
+      Protocol: !Ref ProtocolListenerWorker
+    Type: AWS::ElasticLoadBalancingV2::Listener
+ 
+  LoadBalancerWorker:
+    Properties: 
+      SecurityGroups:
+        - !GetAtt VPC.DefaultSecurityGroup
+        - !Ref SecurityGroupWorker
+      Subnets: 
+        - !Ref SubnetPublic1
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+        
+  RecordSetWorker:
+    Properties: 
+      AliasTarget: 
+        DNSName: !GetAtt LoadBalancerWorker.DNSName
+        HostedZoneId: !GetAtt LoadBalancerWorker.CanonicalHostedZoneID
+      HostedZoneName: !Sub '${HostedZoneName}.'
+      Name: !Sub '${RecordSetNameWorker}.${HostedZoneName}'
+      Type: A
+    Type: AWS::Route53::RecordSet
+      
+  Role:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    Type: AWS::IAM::Role
+
+  RoutePublic:
+    DependsOn: [VPCGatewayAttachment]
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTablePublic
+    Type: AWS::EC2::Route
+
+  RouteTablePublic:
+    Properties:
+      VpcId: !Ref VPC
+    Type: AWS::EC2::RouteTable
+
+  SecurityGroupMaster:
+    Properties:
+      GroupDescription: Allow access to the applications running on the cluster of Master for Service
+      SecurityGroupIngress:
+      - 
+        CidrIp: !Ref SecurityGroupCidrIpMaster
+        FromPort: !Ref PortListenerMaster
+        IpProtocol: !Ref IpProtocolListenerMaster
+        ToPort: !Ref PortListenerMaster
+      VpcId: !Ref VPC
+    Type: AWS::EC2::SecurityGroup
+      
+  SecurityGroupWorker:
+    Properties:
+      GroupDescription: Allow access to the applications running on the cluster of Worker for Service
+      SecurityGroupIngress:
+      - 
+        CidrIp: !Ref SecurityGroupCidrIpWorker
+        FromPort: !Ref PortListenerWorker
+        IpProtocol: !Ref IpProtocolListenerWorker
+        ToPort: !Ref PortListenerWorker
+      VpcId: !Ref VPC
+    Type: AWS::EC2::SecurityGroup
+      
+  SubnetPublic1:
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+      CidrBlock: !Ref SubnetCidrBlockPublic1
+      VpcId: !Ref VPC
+    Type: AWS::EC2::Subnet
+
+  SubnetRouteTableAssociationPublic1:
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublic1
+    Type: AWS::EC2::SubnetRouteTableAssociation
+
+  SubnetRouteTableAssociationPublic2:
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublic2
+    Type: AWS::EC2::SubnetRouteTableAssociation
+
+  SubnetRouteTableAssociationPublic3:
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublic3
+    Type: AWS::EC2::SubnetRouteTableAssociation
+
+  TargetGroupWorker:
+    Properties: 
+      Matcher:
+        HttpCode: !Ref HttpCodeTargetGroupWorker
+      Port: !Ref PortTargetGroupWorker
+      Protocol: !Ref ProtocolTargetGroupWorker
+      Targets: 
+        -   Id: !Ref InstanceWorker1
+      TargetType: instance
+      VpcId: !Ref VPC
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+
+  VPC:
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+    Type: "AWS::EC2::VPC"
+
+  VPCGatewayAttachment:
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+    Type: AWS::EC2::VPCGatewayAttachment
