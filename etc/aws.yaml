@@ -390,6 +390,7 @@ Resources:
           !Sub |
             #!/bin/sh
             sudo yum install -y docker git
+            sudo systemctl enable docker --now
             #git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
             #chmod +x GitRepository/${NodeInstallUrlFileMaster}
             #./GitRepository/${NodeInstallUrlFileMaster}
@@ -416,6 +417,7 @@ Resources:
           !Sub |
             #!/bin/sh
             sudo yum install -y docker git
+            sudo systemctl enable docker --now
             #git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
             #chmod +x GitRepository/${NodeInstallUrlFileMaster}
             #./GitRepository/${NodeInstallUrlFileMaster}
