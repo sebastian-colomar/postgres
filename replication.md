@@ -102,6 +102,11 @@ echo "host replication ${user_replication} samenet trust" | tee --append ${PGDAT
 
 exit
 
+docker \
+    container \
+    restart \
+    ${container_master} \
+
 ```
 ON THE SLAVE INSTANCE
 ```
@@ -132,11 +137,6 @@ docker \
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
-docker \
-    container \
-    restart \
-    ${container_master} \
-
 entrypoint=/bin/bash
 docker \
     container \
