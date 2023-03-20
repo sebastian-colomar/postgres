@@ -315,18 +315,6 @@ Parameters:
 #============================================================
 Resources:
 
-  EIPMaster1:
-    Properties:
-      Domain: vpc
-      InstanceId: !Ref InstanceMaster1
-    Type: AWS::EC2::EIP
-
-  EIPWorker1:
-    Properties:
-      Domain: vpc
-      InstanceId: !Ref InstanceWorker1
-    Type: AWS::EC2::EIP
-
   InstanceMaster1:
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
@@ -374,40 +362,6 @@ Resources:
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-
-  ListenerWorker:
-    Properties: 
-      Certificates:
-        - CertificateArn: !Sub 'arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/${Identifier}'
-      DefaultActions: 
-        - ForwardConfig:
-            TargetGroups:
-            - TargetGroupArn: !Ref TargetGroupWorker
-              Weight: 1
-          Type: forward
-      LoadBalancerArn: !Ref LoadBalancerWorker
-      Port: !Ref PortListenerWorker
-      Protocol: !Ref ProtocolListenerWorker
-    Type: AWS::ElasticLoadBalancingV2::Listener
- 
-  LoadBalancerWorker:
-    Properties: 
-      SecurityGroups:
-        - !GetAtt VPC.DefaultSecurityGroup
-        - !Ref SecurityGroupWorker
-      Subnets: 
-        - !Ref SubnetPublic1
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-        
-  RecordSetWorker:
-    Properties: 
-      AliasTarget: 
-        DNSName: !GetAtt LoadBalancerWorker.DNSName
-        HostedZoneId: !GetAtt LoadBalancerWorker.CanonicalHostedZoneID
-      HostedZoneName: !Sub '${HostedZoneName}.'
-      Name: !Sub '${RecordSetNameWorker}.${HostedZoneName}'
-      Type: A
-    Type: AWS::Route53::RecordSet
       
   Role:
     Properties:
@@ -437,30 +391,6 @@ Resources:
     Properties:
       VpcId: !Ref VPC
     Type: AWS::EC2::RouteTable
-
-  SecurityGroupMaster:
-    Properties:
-      GroupDescription: Allow access to the applications running on the cluster of Master for Service
-      SecurityGroupIngress:
-      - 
-        CidrIp: !Ref SecurityGroupCidrIpMaster
-        FromPort: !Ref PortListenerMaster
-        IpProtocol: !Ref IpProtocolListenerMaster
-        ToPort: !Ref PortListenerMaster
-      VpcId: !Ref VPC
-    Type: AWS::EC2::SecurityGroup
-      
-  SecurityGroupWorker:
-    Properties:
-      GroupDescription: Allow access to the applications running on the cluster of Worker for Service
-      SecurityGroupIngress:
-      - 
-        CidrIp: !Ref SecurityGroupCidrIpWorker
-        FromPort: !Ref PortListenerWorker
-        IpProtocol: !Ref IpProtocolListenerWorker
-        ToPort: !Ref PortListenerWorker
-      VpcId: !Ref VPC
-    Type: AWS::EC2::SecurityGroup
       
   SubnetPublic1:
     Properties:
@@ -477,18 +407,6 @@ Resources:
       RouteTableId: !Ref RouteTablePublic
       SubnetId: !Ref SubnetPublic1
     Type: AWS::EC2::SubnetRouteTableAssociation
-
-  TargetGroupWorker:
-    Properties: 
-      Matcher:
-        HttpCode: !Ref HttpCodeTargetGroupWorker
-      Port: !Ref PortTargetGroupWorker
-      Protocol: !Ref ProtocolTargetGroupWorker
-      Targets: 
-        -   Id: !Ref InstanceWorker1
-      TargetType: instance
-      VpcId: !Ref VPC
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
 
   VPC:
     Properties:
