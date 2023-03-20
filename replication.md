@@ -105,6 +105,8 @@ echo "host replication ${user_replication} ${samenet} trust" | tee --append ${PG
 
 exit
 
+```
+```
 docker \
     container \
     restart \
