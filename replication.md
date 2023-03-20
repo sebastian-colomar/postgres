@@ -16,6 +16,7 @@ protocol=tcp
 user=postgres
 username=postgres
 user_replication=replicator
+
 ```
 ON THE MASTER INSTANCE
 ```
@@ -58,6 +59,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
+    
 ```
 EXECUTE TERMINAL INSIDE MASTER
 ```
@@ -99,6 +101,7 @@ file=pg_hba.conf
 echo "host replication ${user_replication} samenet trust" | tee --append ${PGDATA}/${file}
 
 exit
+
 ```
 ON THE SLAVE INSTANCE
 ```
@@ -165,6 +168,7 @@ pg_basebackup \
     --wal-method stream \
 
 exit
+
 ```
 RUN TERMINAL TO MODIFY SLAVE FILESYSTEM
 ```
@@ -194,6 +198,7 @@ echo "primary_conninfo = 'host=${container_master} port=5432 user=${user_replica
 touch ${PGDATA}/standby.signal
 
 exit
+
 ```
 START SLAVE
 ```
@@ -238,6 +243,7 @@ psql \
     --username ${username} \
 
 exit
+
 ```
 EXECUTE TERMINAL IN MASTER
 ```
@@ -262,6 +268,7 @@ psql \
     --username ${username} \
 
 exit
+
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
@@ -286,6 +293,7 @@ psql \
     --username ${username} \
 
 exit
+
 ```
 EXECUTE TERMINAL IN MASTER
 ```
@@ -305,6 +313,7 @@ DEMOTE MASTER
 touch ${PGDATA}/standby.signal
 
 exit
+
 ```
 RESTART MASTER
 ```
@@ -337,6 +346,7 @@ psql \
     --username ${username} \
 
 exit
+
 ```
 EXECUTE TERMINAL IN SLAVE
 ```
@@ -384,6 +394,7 @@ psql \
     --username ${username} \
 
 exit
+
 ```
 TO DO: CONFIGURE OLD MASTER TO LISTEN TO NEW MASTER
 
