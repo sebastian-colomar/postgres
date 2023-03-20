@@ -51,6 +51,7 @@ Metadata:
           - PrivateIpAddressInstanceMaster1
           - PrivateIpAddressInstanceMaster2
           - PrivateIpAddressInstanceMaster3
+          - PrivateIpAddressInstanceWorker1
           - ProtocolListenerMaster
           - ProtocolListenerWorker
           - ProtocolTargetGroupMaster
@@ -111,6 +112,8 @@ Metadata:
         default: The private IP address for Master 2
       PrivateIpAddressInstanceMaster3:
         default: The private IP address for Master 3
+      PrivateIpAddressInstanceWorker1:
+        default: The private IP address for Worker 1
       ProtocolListenerMaster:
         default: The protocol for Listener Master
       ProtocolListenerWorker:
@@ -276,6 +279,12 @@ Parameters:
       The private IP address for Master 3.
     Type: String
     
+  PrivateIpAddressInstanceWorker1:
+    Default: 10.168.2.200
+    Description: >
+      The private IP address for Worker 1.
+    Type: String
+    
   ProtocolListenerMaster:
     Default: HTTPS
     Description: >
@@ -380,7 +389,7 @@ Resources:
         "Fn::Base64":
           !Sub |
             #!/bin/sh
-            sudo yum install -y git
+            sudo yum install -y docker git
             #git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
             #chmod +x GitRepository/${NodeInstallUrlFileMaster}
             #./GitRepository/${NodeInstallUrlFileMaster}
@@ -398,6 +407,7 @@ Resources:
       IamInstanceProfile: !Ref InstanceProfile
       ImageId: !Ref InstanceWorkerImageId
       InstanceType: !Ref InstanceWorkerInstanceType
+      PrivateIpAddress: !Ref PrivateIpAddressInstanceWorker1
       SecurityGroupIds:
         - !GetAtt VPC.DefaultSecurityGroup
       SubnetId: !Ref SubnetPublic1
@@ -405,7 +415,7 @@ Resources:
         "Fn::Base64":
           !Sub |
             #!/bin/sh
-            sudo yum install -y git
+            sudo yum install -y docker git
             #git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
             #chmod +x GitRepository/${NodeInstallUrlFileMaster}
             #./GitRepository/${NodeInstallUrlFileMaster}
