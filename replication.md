@@ -58,7 +58,8 @@ docker \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
-    ${image} \    
+    ${image} \
+
 ```
 ```
 cmd=/bin/bash
@@ -75,6 +76,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="CREATE TABLE guestbook (visitor_email text, visitor_id serial, date timestamp, message text);"
@@ -104,6 +106,7 @@ docker \
     container \
     restart \
     ${container} \
+
 ```
 ON THE SLAVE INSTANCE:
 ```
@@ -131,6 +134,7 @@ docker \
     volume \
     create \
     ${volume_var} \
+
 ```
 ```
 entrypoint=/bin/bash
@@ -151,6 +155,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${image} \
+
 ```
 ```
 pg_basebackup \
@@ -182,6 +187,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${debian_image} \
+
 ```
 ```
 file=postgresql.conf
@@ -205,7 +211,8 @@ docker \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
-    ${image} \    
+    ${image} \
+
 ```
 ```
 cmd=/bin/bash
@@ -219,6 +226,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="SELECT * FROM guestbook;"
@@ -241,6 +249,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 2.');"
@@ -263,6 +272,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="SELECT * FROM guestbook;"
@@ -284,6 +294,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 touch ${PGDATA}/standby.signal
@@ -295,6 +306,7 @@ docker \
     container \
     restart \
     ${container} \
+
 ```
 ```
 docker \
@@ -307,6 +319,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 3.');"
@@ -329,6 +342,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="INSERT INTO guestbook (visitor_email, date, message) VALUES ('jim@gmail.com', current_date, 'Test 4.');"
@@ -336,6 +350,7 @@ psql \
     --command "${command}" \
     --dbname ${dbname} \
     --username ${username} \
+
 ```
 ```
 pg_ctl promote
@@ -346,6 +361,7 @@ psql \
     --command "${command}" \
     --dbname ${dbname} \
     --username ${username} \
+
 ```
 ```
 command="SELECT * FROM guestbook;"
@@ -377,6 +393,7 @@ docker \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
     ${debian_image} \
+
 ```
 ```
 file=postgresql.conf
@@ -390,6 +407,7 @@ docker \
     container \
     restart \
     ${container} \
+
 ```
 ```
 docker \
@@ -402,6 +420,7 @@ docker \
     --user ${user} \
     ${container} \
     ${cmd} \
+
 ```
 ```
 command="SELECT * FROM guestbook;"
