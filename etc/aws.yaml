@@ -1,5 +1,5 @@
 #########################################################################
-#      Copyright (C) 2023        Sebastian Francisco Colomar Bauza      #
+#      Copyright (C) 2020        Sebastian Francisco Colomar Bauza      #
 #      SPDX-License-Identifier:  GPL-2.0-only                           #
 #########################################################################
 
@@ -7,7 +7,7 @@
 
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description: This template creates a new VPC and deploys 2 ec2 instances in AWS
+Description: This template creates a new VPC and deploys a HA cluster in AWS
 
 #============================================================
 # UI Definition
@@ -49,6 +49,8 @@ Metadata:
           - PortTargetGroupMaster
           - PortTargetGroupWorker
           - PrivateIpAddressInstanceMaster1
+          - PrivateIpAddressInstanceMaster2
+          - PrivateIpAddressInstanceMaster3
           - ProtocolListenerMaster
           - ProtocolListenerWorker
           - ProtocolTargetGroupMaster
@@ -57,6 +59,8 @@ Metadata:
           - SecurityGroupCidrIpMaster
           - SecurityGroupCidrIpWorker
           - SubnetCidrBlockPublic1
+          - SubnetCidrBlockPublic2
+          - SubnetCidrBlockPublic3
           - VPCCidrBlock
       -
         Label:
@@ -103,6 +107,10 @@ Metadata:
         default: The internal listening port for Target Group Worker
       PrivateIpAddressInstanceMaster1:
         default: The private IP address for Master 1
+      PrivateIpAddressInstanceMaster2:
+        default: The private IP address for Master 2
+      PrivateIpAddressInstanceMaster3:
+        default: The private IP address for Master 3
       ProtocolListenerMaster:
         default: The protocol for Listener Master
       ProtocolListenerWorker:
@@ -119,6 +127,10 @@ Metadata:
         default: Allowed CIDR for ALB Cluster Worker Access
       SubnetCidrBlockPublic1:
         default: Public Subnet 1 CIDR
+      SubnetCidrBlockPublic2:
+        default: Public Subnet 2 CIDR
+      SubnetCidrBlockPublic3:
+        default: Public Subnet 3 CIDR
       VPCCidrBlock:
         default: VPC CIDR
                 
@@ -157,7 +169,7 @@ Parameters:
     Type: String
     
   InstanceMasterInstanceType:
-    Default: 't2.micro'
+    Default: 't3a.small'
     Description: >
       Select Amazon EC2 instance type for the Cluster Master instances.
     Type: String
@@ -175,7 +187,7 @@ Parameters:
     Type: String
     
   InstanceWorkerInstanceType:
-    Default: 't2.micro'
+    Default: 't3a.micro'
     Description: >
       Select Amazon EC2 instance type for the Cluster Worker instances.
     Type: String
@@ -205,7 +217,7 @@ Parameters:
     Type: String
     
   NodeInstallUrlPath:
-    Default: "https://github.com/academiaonline-org/postgres"
+    Default: "https://github.com/academiaonline/aws"
     Description: >
       The URL path to download the script for the common install of the nodes.
     Type: String
@@ -250,6 +262,18 @@ Parameters:
     Default: 10.168.2.100
     Description: >
       The private IP address for Master 1.
+    Type: String
+    
+  PrivateIpAddressInstanceMaster2:
+    Default: 10.168.4.100
+    Description: >
+      The private IP address for Master 2.
+    Type: String
+    
+  PrivateIpAddressInstanceMaster3:
+    Default: 10.168.6.100
+    Description: >
+      The private IP address for Master 3.
     Type: String
     
   ProtocolListenerMaster:
@@ -306,6 +330,20 @@ Parameters:
       All resources located on this subnet are provided an IP within this address block. 
     Type: String
     
+  SubnetCidrBlockPublic2:
+    Default: 10.168.4.0/24
+    Description: >
+      CIDR block for public (DMZ) subnet located in Availability Zone 2. 
+      All resources located on this subnet are provided an IP within this address block. 
+    Type: String
+    
+  SubnetCidrBlockPublic3:
+    Default: 10.168.6.0/24
+    Description: >
+      CIDR block for public (DMZ) subnet located in Availability Zone 3. 
+      All resources located on this subnet are provided an IP within this address block. 
+    Type: String
+    
   VPCCidrBlock:
     Default: 10.168.0.0/16
     Description: >
@@ -316,6 +354,18 @@ Parameters:
 # Resources
 #============================================================
 Resources:
+
+  EIPMaster1:
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref InstanceMaster1
+    Type: AWS::EC2::EIP
+
+  EIPWorker1:
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref InstanceWorker1
+    Type: AWS::EC2::EIP
 
   InstanceMaster1:
     Properties:
