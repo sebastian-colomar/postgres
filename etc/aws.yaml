@@ -318,7 +318,7 @@ Resources:
   InstanceMaster1:
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
-      ImageId: !Ref InstanceMasterImageId
+      #ImageId: !Ref InstanceMasterImageId
       InstanceType: !Ref InstanceMasterInstanceType
       PrivateIpAddress: !Ref PrivateIpAddressInstanceMaster1
       SecurityGroupIds:
@@ -329,10 +329,10 @@ Resources:
           !Sub |
             #!/bin/sh
             sudo yum install -y git
-            git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
-            chmod +x GitRepository/${NodeInstallUrlFileMaster}
-            ./GitRepository/${NodeInstallUrlFileMaster}
-            rm --force --recursive GitRepository
+            #git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
+            #chmod +x GitRepository/${NodeInstallUrlFileMaster}
+            #./GitRepository/${NodeInstallUrlFileMaster}
+            #rm --force --recursive GitRepository
     Type: AWS::EC2::Instance
             
   InstanceProfile:
@@ -344,7 +344,7 @@ Resources:
     DependsOn: [VPCGatewayAttachment]  
     Properties:
       IamInstanceProfile: !Ref InstanceProfile
-      ImageId: !Ref InstanceWorkerImageId
+      #ImageId: !Ref InstanceWorkerImageId
       InstanceType: !Ref InstanceWorkerInstanceType
       SecurityGroupIds:
         - !GetAtt VPC.DefaultSecurityGroup
@@ -354,10 +354,10 @@ Resources:
           !Sub |
             #!/bin/sh
             sudo yum install -y git
-            git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
-            chmod +x GitRepository/${NodeInstallUrlFileMaster}
-            ./GitRepository/${NodeInstallUrlFileMaster}
-            rm --force --recursive GitRepository
+            #git clone --single-branch --branch ${BranchAWS} ${NodeInstallUrlPath} GitRepository
+            #chmod +x GitRepository/${NodeInstallUrlFileMaster}
+            #./GitRepository/${NodeInstallUrlFileMaster}
+            #rm --force --recursive GitRepository
     Type: AWS::EC2::Instance
 
   InternetGateway:
