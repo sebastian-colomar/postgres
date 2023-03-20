@@ -1,4 +1,4 @@
-ON THE MASTER INSTANCE
+ON BOTH MASTER AND SLAVE INSTANCES
 ```
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
@@ -11,10 +11,14 @@ mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
 mount_var=/var/lib/postgresql
 network=replication
+port=5432
+protocol=tcp
 user=postgres
 username=postgres
 user_replication=replicator
-
+```
+ON THE MASTER INSTANCE
+```
 volume_data=${container_master}_data
 volume_run=${container_master}_run
 volume_var=${container_master}_var
@@ -47,6 +51,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container_master} \
     --network ${network} \
+    --publish ${port}:${port}/${protocol} \
     --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
@@ -97,24 +102,14 @@ exit
 ```
 ON THE SLAVE INSTANCE
 ```
-PGDATA=/var/lib/postgresql/data/pgdata
-POSTGRES_PASSWORD=mysecretpassword
-
-container_master=pg-master
-container_slave=pg-slave
-dbname=postgres
-image=academiaonline/postgres:latest
-mount_data=/var/lib/postgresql/data
-mount_run=/run/postgresql
-mount_var=/var/lib/postgresql
-network=replication
-user=postgres
-username=postgres
-user_replication=replicator
-
 volume_data=${container_slave}_data
 volume_run=${container_slave}_run
 volume_var=${container_slave}_var
+
+docker \
+    network \
+    create \
+    ${network} \
 
 docker \
     volume \
@@ -210,6 +205,7 @@ docker \
     --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
     --name ${container_slave} \
     --network ${network} \
+    --publish ${port}:${port}/${protocol} \
     --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
