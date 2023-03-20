@@ -49,8 +49,6 @@ Metadata:
           - PortTargetGroupMaster
           - PortTargetGroupWorker
           - PrivateIpAddressInstanceMaster1
-          - PrivateIpAddressInstanceMaster2
-          - PrivateIpAddressInstanceMaster3
           - ProtocolListenerMaster
           - ProtocolListenerWorker
           - ProtocolTargetGroupMaster
@@ -59,8 +57,6 @@ Metadata:
           - SecurityGroupCidrIpMaster
           - SecurityGroupCidrIpWorker
           - SubnetCidrBlockPublic1
-          - SubnetCidrBlockPublic2
-          - SubnetCidrBlockPublic3
           - VPCCidrBlock
       -
         Label:
@@ -107,10 +103,6 @@ Metadata:
         default: The internal listening port for Target Group Worker
       PrivateIpAddressInstanceMaster1:
         default: The private IP address for Master 1
-      PrivateIpAddressInstanceMaster2:
-        default: The private IP address for Master 2
-      PrivateIpAddressInstanceMaster3:
-        default: The private IP address for Master 3
       ProtocolListenerMaster:
         default: The protocol for Listener Master
       ProtocolListenerWorker:
@@ -127,10 +119,6 @@ Metadata:
         default: Allowed CIDR for ALB Cluster Worker Access
       SubnetCidrBlockPublic1:
         default: Public Subnet 1 CIDR
-      SubnetCidrBlockPublic2:
-        default: Public Subnet 2 CIDR
-      SubnetCidrBlockPublic3:
-        default: Public Subnet 3 CIDR
       VPCCidrBlock:
         default: VPC CIDR
                 
@@ -488,18 +476,6 @@ Resources:
     Properties:
       RouteTableId: !Ref RouteTablePublic
       SubnetId: !Ref SubnetPublic1
-    Type: AWS::EC2::SubnetRouteTableAssociation
-
-  SubnetRouteTableAssociationPublic2:
-    Properties:
-      RouteTableId: !Ref RouteTablePublic
-      SubnetId: !Ref SubnetPublic2
-    Type: AWS::EC2::SubnetRouteTableAssociation
-
-  SubnetRouteTableAssociationPublic3:
-    Properties:
-      RouteTableId: !Ref RouteTablePublic
-      SubnetId: !Ref SubnetPublic3
     Type: AWS::EC2::SubnetRouteTableAssociation
 
   TargetGroupWorker:
