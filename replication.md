@@ -6,6 +6,7 @@ POSTGRES_PASSWORD=mysecretpassword
 container_master=pg-master
 container_slave=pg-slave
 dbname=postgres
+host=10.168.2.100
 image=academiaonline/postgres:latest
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
@@ -13,6 +14,7 @@ mount_var=/var/lib/postgresql
 network=replication
 port=5432
 protocol=tcp
+samenet=10.168.2.0/24
 user=postgres
 username=postgres
 user_replication=replicator
@@ -98,7 +100,7 @@ createuser \
     --username ${username} \
 
 file=pg_hba.conf
-echo "host replication ${user_replication} samenet trust" | tee --append ${PGDATA}/${file}
+echo "host replication ${user_replication} ${samenet} trust" | tee --append ${PGDATA}/${file}
 
 exit
 
@@ -160,7 +162,7 @@ docker \
 RUN BASE BACKUP
 ```
 pg_basebackup \
-    --host ${container_master} \
+    --host ${host} \
     --pgdata ${PGDATA} \
     --progress \
     --username ${user_replication} \
