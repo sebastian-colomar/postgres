@@ -215,7 +215,6 @@ docker \
 
 ```
 ```
-cmd=/bin/bash
 docker \
     container \
     exec \
