@@ -6,7 +6,8 @@ POSTGRES_PASSWORD=mysecretpassword
 cmd=/bin/bash
 dbname=postgres
 entrypoint=/bin/bash
-host=10.168.2.100
+host_master=10.168.2.100
+host_slave=10.168.2.200
 image=academiaonline/postgres:latest
 mount_data=/var/lib/postgresql/data
 mount_run=/run/postgresql
@@ -142,7 +143,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env host=${host} \
+    --env host_master=${host_master} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
@@ -159,7 +160,7 @@ docker \
 ```
 ```
 pg_basebackup \
-    --host ${host} \
+    --host ${host_master} \
     --pgdata ${PGDATA} \
     --progress \
     --username ${user_replication} \
@@ -174,7 +175,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env host=${host} \
+    --env host_master=${host_master} \
     --env port=${port} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
@@ -191,7 +192,7 @@ docker \
 ```
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=${host} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${host_master} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
@@ -379,7 +380,7 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env host=${host} \
+    --env host_slave=${host_slave} \
     --env port=${port} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
@@ -396,7 +397,7 @@ docker \
 ```
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=${host} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${host_slave} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
