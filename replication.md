@@ -3,7 +3,9 @@ ON BOTH MASTER AND SLAVE INSTANCES
 PGDATA=/var/lib/postgresql/data/pgdata
 POSTGRES_PASSWORD=mysecretpassword
 
+cmd=/bin/bash
 dbname=postgres
+entrypoint=/bin/bash
 host=10.168.2.100
 image=academiaonline/postgres:latest
 mount_data=/var/lib/postgresql/data
@@ -62,7 +64,6 @@ docker \
 
 ```
 ```
-cmd=/bin/bash
 docker \
     container \
     exec \
@@ -137,7 +138,6 @@ docker \
 
 ```
 ```
-entrypoint=/bin/bash
 docker \
     container \
     run \
