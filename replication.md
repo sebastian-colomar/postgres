@@ -23,6 +23,7 @@ user_replication=replicator
 ON THE MASTER INSTANCE:
 ```
 container=pg-master
+
 volume_data=${container}_data
 volume_run=${container}_run
 volume_var=${container}_var
@@ -113,6 +114,7 @@ docker \
 ON THE SLAVE INSTANCE:
 ```
 container=pg-slave
+
 volume_data=${container}_data
 volume_run=${container}_run
 volume_var=${container}_var
@@ -170,7 +172,6 @@ pg_basebackup \
 exit
 ```
 ```
-debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
 docker \
     container \
     run \
@@ -187,7 +188,7 @@ docker \
     --volume ${volume_data}:${mount_data} \
     --volume ${volume_run}:${mount_run} \
     --volume ${volume_var}:${mount_var} \
-    ${debian_image} \
+    ${image} \
 
 ```
 ```
@@ -374,25 +375,18 @@ exit
 ```
 ON THE MASTER INSTANCE:
 ```
-debian_image=library/debian:stable-slim@sha256:a7cb457754b303da3e1633601c77636a0e05e6c26831d1f58c0e6b280f3f7c88
-host=10.168.2.210
 docker \
     container \
-    run \
+    exec \
     --env PGDATA=${PGDATA} \
     --env host_slave=${host_slave} \
     --env port=${port} \
     --env user_replication=${user_replication} \
-    --entrypoint ${entrypoint} \
     --interactive \
-    --network ${network} \
-    --read-only \
-    --rm \
     --tty \
-    --volume ${volume_data}:${mount_data} \
-    --volume ${volume_run}:${mount_run} \
-    --volume ${volume_var}:${mount_var} \
-    ${debian_image} \
+    --user ${user} \
+    ${container} \
+    ${cmd} \
 
 ```
 ```
