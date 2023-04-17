@@ -1,6 +1,6 @@
 ON BOTH MASTER AND SLAVE INSTANCES
 ```
-PGDATA=/var/lib/postgresql/data/pgdata
+PGDATA=/var/lib/pgsql/data/userdata
 POSTGRES_PASSWORD=mysecretpassword
 
 cmd=/bin/bash
@@ -8,10 +8,10 @@ dbname=postgres
 entrypoint=/bin/bash
 host_master=10.168.2.100
 host_slave=10.168.2.200
-image=academiaonline/postgres:latest
-mount_data=/var/lib/postgresql/data
-mount_run=/run/postgresql
-mount_var=/var/lib/postgresql
+image=registry.redhat.io/rhel9/postgresql-13:1-103.1675794536
+mount_data=/var/lib/pgsql/data
+mount_run=/var/run/postgresql
+mount_var=/var/lib/pgsql
 network=replication
 port=5432
 protocol=tcp
