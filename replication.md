@@ -1,7 +1,7 @@
 ON BOTH MASTER AND SLAVE INSTANCES
 ```
 PGDATA=/var/lib/pgsql/data/userdata
-POSTGRES_PASSWORD=mysecretpassword
+POSTGRESQL_ADMIN_PASSWORD=mysecretpassword
 
 cmd=/bin/bash
 dbname=postgres
@@ -53,7 +53,7 @@ docker \
     run \
     --detach \
     --env PGDATA=${PGDATA} \
-    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+    --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
     --name ${container} \
     --network ${network} \
     --publish ${port}:${port}/${protocol} \
@@ -204,7 +204,7 @@ docker \
     run \
     --detach \
     --env PGDATA=${PGDATA} \
-    --env POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+    --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
     --name ${container} \
     --network ${network} \
     --publish ${port}:${port}/${protocol} \
