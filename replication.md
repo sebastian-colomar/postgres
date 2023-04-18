@@ -43,7 +43,6 @@ docker \
     --env POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} \
     --env POSTGRESQL_USER=${POSTGRESQL_USER} \
     --name ${container} \
-    --network ${network} \
     --publish ${port}:${port}/${protocol} \
     --restart always \
     --volume ${volume_data}:${mount_data} \
