@@ -88,6 +88,7 @@ exit
 ON THE SLAVE INSTANCE:
 ```
 container=pg-slave
+mount_start=/usr/share/container-scripts/postgresql/start
 volume_start=/postgres/START
 
 mkdir -p ${volume_data} && chmod 777 ${volume_data}
@@ -163,7 +164,7 @@ docker \
     --publish ${port}:${port}/${protocol} \
     --restart always \
     --volume ${volume_data}:${mount_data} \
-    --volume ${volume_start}:${volume_start} \
+    --volume ${volume_start}:${mount_start} \
     ${image} \
 
 ```
