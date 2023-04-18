@@ -375,4 +375,5 @@ exit
 CLEAN UP
 ```
 docker container rm --force $( docker container ls --all --quiet )
+rm -rf ${volume_data}
 ```
