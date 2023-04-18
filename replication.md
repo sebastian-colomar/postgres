@@ -85,13 +85,6 @@ psql \
 exit
 
 ```
-```
-docker \
-    container \
-    restart \
-    ${container} \
-
-```
 ON THE SLAVE INSTANCE:
 ```
 container=pg-slave
