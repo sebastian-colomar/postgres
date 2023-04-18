@@ -154,6 +154,11 @@ docker \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
+    --env POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} \
+    --env POSTGRESQL_MAX_CONNECTIONS=${POSTGRESQL_MAX_CONNECTIONS} \
+    --env POSTGRESQL_SHARED_BUFFERS=${POSTGRESQL_SHARED_BUFFERS} \
+    --env POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} \
+    --env POSTGRESQL_USER=${POSTGRESQL_USER} \
     --name ${container} \
     --publish ${port}:${port}/${protocol} \
     --restart always \
