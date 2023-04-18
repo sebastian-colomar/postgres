@@ -90,6 +90,7 @@ ON THE SLAVE INSTANCE:
 container=pg-slave
 volume_start=/postgres/START
 
+mkdir -p ${volume_data} && chmod 777 ${volume_data}
 mkdir -p ${volume_start} && chmod 777 ${volume_start}
 
 ```
