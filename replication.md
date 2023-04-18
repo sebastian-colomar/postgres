@@ -117,7 +117,7 @@ pg_basebackup \
     --host ${host_master} \
     --pgdata ${PGDATA} \
     --progress \
-    --username ${user_replication} \
+    --username ${replication_user} \
     --verbose \
     --wal-method stream \
 
