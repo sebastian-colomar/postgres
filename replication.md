@@ -1,67 +1,53 @@
 ON BOTH MASTER AND SLAVE INSTANCES
 ```
 PGDATA=/var/lib/pgsql/data/userdata
-POSTGRESQL_ADMIN_PASSWORD=mysecretpassword
+POSTGRESQL_ADMIN_PASSWORD=xxx
+POSTGRESQL_DATABASE=database
+POSTGRESQL_MAX_CONNECTIONS=1200
+POSTGRESQL_SHARED_BUFFERS=512MB
+POSTGRESQL_USER=user
+POSTGRESQL_PASSWORD=xxx
 
 cmd=/bin/bash
 dbname=postgres
 entrypoint=/bin/bash
 host_master=10.168.2.100
 host_slave=10.168.2.200
-image=registry.redhat.io/rhel9/postgresql-13:1-103.1675794536
+image=registry.redhat.io/rhel9/postgresql-13:1-103
 mount_data=/var/lib/pgsql/data
-mount_run=/var/run/postgresql
-mount_var=/var/lib/pgsql
 network=replication
 port=5432
 protocol=tcp
 samenet=10.168.2.0/24
 user=postgres
 username=postgres
-user_replication=replicator
+user_replication=postgres
+volume_data=/postgres/DATA
 ```
 ON THE MASTER INSTANCE:
 ```
 container=pg-master
 
-volume_data=${container}_data
-volume_run=${container}_run
-volume_var=${container}_var
+mkdir -p ${volume_data} && chmod 777 ${volume_data}
 
-docker \
-    network \
-    create \
-    ${network} \
-
-docker \
-    volume \
-    create \
-    ${volume_data} \
-
-docker \
-    volume \
-    create \
-    ${volume_run} \
-
-docker \
-    volume \
-    create \
-    ${volume_var} \
-
+```
+```
 docker \
     container \
     run \
     --detach \
     --env PGDATA=${PGDATA} \
     --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
+    --env POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} \
+    --env POSTGRESQL_MAX_CONNECTIONS=${POSTGRESQL_MAX_CONNECTIONS} \
+    --env POSTGRESQL_SHARED_BUFFERS=${POSTGRESQL_SHARED_BUFFERS} \
+    --env POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} \
+    --env POSTGRESQL_USER=${POSTGRESQL_USER} \
     --name ${container} \
     --network ${network} \
     --publish ${port}:${port}/${protocol} \
-    --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
-    --volume ${volume_run}:${mount_run} \
-    --volume ${volume_var}:${mount_var} \
     ${image} \
 
 ```
@@ -94,15 +80,8 @@ psql \
     --dbname ${dbname} \
     --username ${username} \
 
-createuser \
-    ${user_replication} \
-    --replication \
-    --username ${username} \
-
-file=pg_hba.conf
-echo "host replication ${user_replication} ${samenet} trust" | tee --append ${PGDATA}/${file}
-
 exit
+
 ```
 ```
 docker \
@@ -114,30 +93,9 @@ docker \
 ON THE SLAVE INSTANCE:
 ```
 container=pg-slave
+volume_start=/postgres/START
 
-volume_data=${container}_data
-volume_run=${container}_run
-volume_var=${container}_var
-
-docker \
-    network \
-    create \
-    ${network} \
-
-docker \
-    volume \
-    create \
-    ${volume_data} \
-
-docker \
-    volume \
-    create \
-    ${volume_run} \
-
-docker \
-    volume \
-    create \
-    ${volume_var} \
+mkdir -p ${volume_start} && chmod 777 ${volume_start}
 
 ```
 ```
@@ -149,14 +107,10 @@ docker \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
-    --network ${network} \
-    --read-only \
     --rm \
     --tty \
     --user ${user} \
     --volume ${volume_data}:${mount_data} \
-    --volume ${volume_run}:${mount_run} \
-    --volume ${volume_var}:${mount_var} \
     ${image} \
 
 ```
@@ -176,24 +130,21 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
+    --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
     --env host_master=${host_master} \
     --env port=${port} \
     --env user_replication=${user_replication} \
     --entrypoint ${entrypoint} \
     --interactive \
-    --network ${network} \
-    --read-only \
     --rm \
     --tty \
     --volume ${volume_data}:${mount_data} \
-    --volume ${volume_run}:${mount_run} \
-    --volume ${volume_var}:${mount_var} \
     ${image} \
 
 ```
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=${host_master} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${host_master} port=${port} user=${user_replication} password=${POSTGRESQL_ADMIN_PASSWORD}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
@@ -206,13 +157,10 @@ docker \
     --env PGDATA=${PGDATA} \
     --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
     --name ${container} \
-    --network ${network} \
     --publish ${port}:${port}/${protocol} \
-    --read-only \
     --restart always \
     --volume ${volume_data}:${mount_data} \
-    --volume ${volume_run}:${mount_run} \
-    --volume ${volume_var}:${mount_var} \
+    --volume ${volume_start}:${volume_start} \
     ${image} \
 
 ```
@@ -428,6 +376,4 @@ exit
 CLEAN UP
 ```
 docker container rm --force $( docker container ls --all --quiet )
-docker network rm $( docker network ls --quiet )
-docker volume rm $( docker volume ls --quiet )
 ```
