@@ -62,7 +62,6 @@ docker \
     --env mount_data=${mount_data} \
     --env samenet=${samenet} \
     --env username=${username} \
-    --env user_replication=${user_replication} \
     --interactive \
     --tty \
     --user ${user} \
@@ -103,7 +102,7 @@ docker \
     run \
     --env PGDATA=${PGDATA} \
     --env host_master=${host_master} \
-    --env user_replication=${user_replication} \
+    --env replication_user=${replication_user} \
     --entrypoint ${entrypoint} \
     --interactive \
     --rm \
