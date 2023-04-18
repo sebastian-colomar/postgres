@@ -8,12 +8,14 @@ POSTGRESQL_SHARED_BUFFERS=512MB
 POSTGRESQL_USER=user
 POSTGRESQL_PASSWORD=xxx
 
+registry=registry.redhat.io
+
 cmd=/bin/bash
 dbname=postgres
 entrypoint=/bin/bash
 host_master=10.168.2.100
 host_slave=10.168.2.200
-image=registry.redhat.io/rhel9/postgresql-13:1-103
+image=${registry}/rhel9/postgresql-13:1-103
 mount_data=/var/lib/pgsql/data
 port=5432
 protocol=tcp
@@ -31,6 +33,8 @@ mkdir -p ${volume_data} && chmod 777 ${volume_data}
 
 ```
 ```
+docker login ${registry}
+
 docker \
     container \
     run \
@@ -97,6 +101,8 @@ mkdir -p ${volume_start} && chmod 777 ${volume_start}
 
 ```
 ```
+docker login ${registry}
+
 docker \
     container \
     run \
