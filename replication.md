@@ -22,7 +22,8 @@ protocol=tcp
 samenet=10.168.2.0/24
 user=postgres
 username=postgres
-user_replication=postgres
+replication_password=xxx
+replication_user=postgres
 volume_data=/postgres/DATA
 ```
 ON THE MASTER INSTANCE:
@@ -128,10 +129,10 @@ docker \
     container \
     run \
     --env PGDATA=${PGDATA} \
-    --env POSTGRESQL_ADMIN_PASSWORD=${POSTGRESQL_ADMIN_PASSWORD} \
     --env host_master=${host_master} \
     --env port=${port} \
-    --env user_replication=${user_replication} \
+    --env replication_password=${replication_password} \
+    --env replication_user=${replication_user} \
     --entrypoint ${entrypoint} \
     --interactive \
     --rm \
@@ -142,7 +143,7 @@ docker \
 ```
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=${host_master} port=${port} user=${user_replication} password=${POSTGRESQL_ADMIN_PASSWORD}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${host_master} password=${replication_password} port=${port} user=${replication_user}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
@@ -327,7 +328,7 @@ docker \
     --env PGDATA=${PGDATA} \
     --env host_slave=${host_slave} \
     --env port=${port} \
-    --env user_replication=${user_replication} \
+    --env replication_user=${replication_user} \
     --interactive \
     --tty \
     --user ${user} \
@@ -337,7 +338,7 @@ docker \
 ```
 ```
 file=postgresql.conf
-echo "primary_conninfo = 'host=${host_slave} port=${port} user=${user_replication}'" | tee --append ${PGDATA}/${file}
+echo "primary_conninfo = 'host=${host_slave} password=${replication_password} port=${port} user=${replication_user}'" | tee --append ${PGDATA}/${file}
 touch ${PGDATA}/standby.signal
 
 exit
