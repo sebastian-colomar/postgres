@@ -15,7 +15,6 @@ host_master=10.168.2.100
 host_slave=10.168.2.200
 image=registry.redhat.io/rhel9/postgresql-13:1-103
 mount_data=/var/lib/pgsql/data
-network=replication
 port=5432
 protocol=tcp
 samenet=10.168.2.0/24
