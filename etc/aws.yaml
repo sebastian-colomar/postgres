@@ -39,43 +39,14 @@ Metadata:
         Label:
           default: Network Configuration
         Parameters:
-          - HostedZoneName
-          - HttpCodeTargetGroupMaster
-          - HttpCodeTargetGroupWorker
-          - IpProtocolListenerMaster
-          - IpProtocolListenerWorker
-          - PortListenerMaster
-          - PortListenerWorker
-          - PortTargetGroupMaster
-          - PortTargetGroupWorker
           - PrivateIpAddressInstanceMaster1
-          - PrivateIpAddressInstanceMaster2
-          - PrivateIpAddressInstanceMaster3
           - PrivateIpAddressInstanceWorker1
-          - ProtocolListenerMaster
-          - ProtocolListenerWorker
-          - ProtocolTargetGroupMaster
-          - ProtocolTargetGroupWorker
-          - RecordSetNameWorker
-          - SecurityGroupCidrIpMaster
-          - SecurityGroupCidrIpWorker
           - SubnetCidrBlockPublic1
-          - SubnetCidrBlockPublic2
-          - SubnetCidrBlockPublic3
           - VPCCidrBlock
-      -
-        Label:
-          default: Security
-        Parameters:
-          - Identifier
           
     ParameterLabels:
       BranchAWS:
         default: The branch of the git repo to download the script for the common install of the nodes
-      HostedZoneName:
-        default: The name of the hosted zone that you want to create records in
-      Identifier:
-        default: The Identifier of the certificate you want to use
       InstanceMasterImageId:
         default: AMI to use for Cluster Master Instances
       InstanceMasterInstanceType:
@@ -84,56 +55,18 @@ Metadata:
         default: AMI to use for Cluster Worker Instances
       InstanceWorkerInstanceType:
         default: Cluster Worker Instance Size
-      IpProtocolListenerMaster:
-        default: The IP protocol for Listener Master
-      IpProtocolListenerWorker:
-        default: The IP protocol for Listener Worker
-      HttpCodeTargetGroupMaster:
-        default: The HTTP codes to use when checking for a successful response from Master Group
-      HttpCodeTargetGroupWorker:
-        default: The HTTP codes to use when checking for a successful response from Worker Group
       NodeInstallUrlPath:
         default: The URL path to download the script for the common install of the nodes
       NodeInstallUrlFileMaster:
         default: The name of the script for the common install of the Master nodes
       NodeInstallUrlFileWorker:
         default: The name of the script for the common install of the Worker nodes
-      PortListenerMaster:
-        default: The listening port for Listener Master
-      PortListenerWorker:
-        default: The listening port for Listener Worker
-      PortTargetGroupMaster:
-        default: The internal listening port for Target Group Master
-      PortTargetGroupWorker:
-        default: The internal listening port for Target Group Worker
       PrivateIpAddressInstanceMaster1:
         default: The private IP address for Master 1
-      PrivateIpAddressInstanceMaster2:
-        default: The private IP address for Master 2
-      PrivateIpAddressInstanceMaster3:
-        default: The private IP address for Master 3
       PrivateIpAddressInstanceWorker1:
         default: The private IP address for Worker 1
-      ProtocolListenerMaster:
-        default: The protocol for Listener Master
-      ProtocolListenerWorker:
-        default: The protocol for Listener Worker
-      ProtocolTargetGroupMaster:
-        default: The internal protocol for Target Group Master
-      ProtocolTargetGroupWorker:
-        default: The internal protocol for Target Group Worker
-      RecordSetNameWorker:
-        default: The name of the Record Set for Worker service
-      SecurityGroupCidrIpMaster:
-        default: Allowed CIDR for ALB Cluster Master Access
-      SecurityGroupCidrIpWorker:
-        default: Allowed CIDR for ALB Cluster Worker Access
       SubnetCidrBlockPublic1:
         default: Public Subnet 1 CIDR
-      SubnetCidrBlockPublic2:
-        default: Public Subnet 2 CIDR
-      SubnetCidrBlockPublic3:
-        default: Public Subnet 3 CIDR
       VPCCidrBlock:
         default: VPC CIDR
                 
@@ -145,20 +78,6 @@ Parameters:
       The branch of the git repo to download the script for the common install of the nodes.
     Type: String
     
-  HostedZoneName:
-#    Default: 'sebastian-colomar.es'
-    Default: 'sebastian-colomar.com'
-    Description: >
-      The name of the hosted zone that you want to create records in.
-    Type: String
-
-  Identifier:
-#    Default: '31ea6050-d1a0-4e91-a37b-ed862904188c' #IRELAND #sebastian-colomar.com
-    Default: 'c3f3310b-f4ed-4874-8849-bd5c2cfe001f' #MUMBAI #sebastian-colomar.com
-    Description: >
-      The Identifier of the certificate you want to use.
-    Type: String
-
   InstanceMasterImageId:
 #    Default: 'ami-0db0b3ab7df22e366' #MUMBAI #UBUNTU18
 #    Default: 'ami-026f33d38b6410e30' #MUMBAI #CENTOS7
@@ -195,30 +114,6 @@ Parameters:
       Select Amazon EC2 instance type for the Cluster Worker instances.
     Type: String
     
-  IpProtocolListenerMaster:
-    Default: tcp
-    Description: >
-      The IP protocol for Listener Master.
-    Type: String
-    
-  IpProtocolListenerWorker:
-    Default: tcp
-    Description: >
-      The IP protocol for Listener Worker.
-    Type: String
-    
-  HttpCodeTargetGroupMaster:
-    Default: "200-399"
-    Description: >
-      The HTTP codes to use when checking for a successful response from Master Group.
-    Type: String
-    
-  HttpCodeTargetGroupWorker:
-    Default: "200-399"
-    Description: >
-      The HTTP codes to use when checking for a successful response from Worker Group.
-    Type: String
-    
   NodeInstallUrlPath:
     Default: "https://github.com/academiaonline/aws"
     Description: >
@@ -237,46 +132,10 @@ Parameters:
       The name of the script for the common install of the Worker nodes.
     Type: String
     
-  PortListenerMaster:
-    Default: 443
-    Description: >
-      The listening port for Listener Master.
-    Type: Number
-    
-  PortListenerWorker:
-    Default: 443
-    Description: >
-      The listening port for Listener Worker.
-    Type: Number
-    
-  PortTargetGroupMaster:
-    Default: 30000
-    Description: >
-      The internal listening port for Target Group Master.
-    Type: Number
-    
-  PortTargetGroupWorker:
-    Default: 30000
-    Description: >
-      The internal listening port for Target Group Worker.
-    Type: Number
-    
   PrivateIpAddressInstanceMaster1:
     Default: 10.168.2.100
     Description: >
       The private IP address for Master 1.
-    Type: String
-    
-  PrivateIpAddressInstanceMaster2:
-    Default: 10.168.4.100
-    Description: >
-      The private IP address for Master 2.
-    Type: String
-    
-  PrivateIpAddressInstanceMaster3:
-    Default: 10.168.6.100
-    Description: >
-      The private IP address for Master 3.
     Type: String
     
   PrivateIpAddressInstanceWorker1:
@@ -285,71 +144,10 @@ Parameters:
       The private IP address for Worker 1.
     Type: String
     
-  ProtocolListenerMaster:
-    Default: HTTPS
-    Description: >
-      The protocol for Listener Master.
-    Type: String
-    
-  ProtocolListenerWorker:
-    Default: HTTPS
-    Description: >
-      The protocol for Listener Worker.
-    Type: String
-    
-  ProtocolTargetGroupMaster:
-    Default: HTTP
-    Description: >
-      The internal protocol for Target Group Master.
-    Type: String
-
-  ProtocolTargetGroupWorker:
-    Default: HTTP
-    Description: >
-      The internal protocol for Target Group Worker.
-    Type: String
-
-  RecordSetNameWorker:
-    Default: myapp-worker
-    Description: >
-      The name of the Record Set for service.
-      It needs to be unique in the sub-domain.
-    Type: String
-  
-  SecurityGroupCidrIpMaster:
-    Default: 0.0.0.0/0
-    Description: >
-      Allowed CIDR block for external web access to the Cluster Master Load Balancer. 
-      It defines the block of IPs that can access the Cluster Master Load Balancer and, consequently, the application servers. 
-      Set it to 0.0.0.0/0 to make it accessible from anywhere.
-    Type: String
-    
-  SecurityGroupCidrIpWorker:
-    Default: 0.0.0.0/0
-    Description: >
-      Allowed CIDR block for external web access to the Cluster Worker Load Balancer. 
-      It defines the block of IPs that can access the Cluster Worker Load Balancer and, consequently, the application servers. 
-      Set it to 0.0.0.0/0 to make it accessible from anywhere.
-    Type: String
-    
   SubnetCidrBlockPublic1:
     Default: 10.168.2.0/24
     Description: >
       CIDR block for public (DMZ) subnet located in Availability Zone 1. 
-      All resources located on this subnet are provided an IP within this address block. 
-    Type: String
-    
-  SubnetCidrBlockPublic2:
-    Default: 10.168.4.0/24
-    Description: >
-      CIDR block for public (DMZ) subnet located in Availability Zone 2. 
-      All resources located on this subnet are provided an IP within this address block. 
-    Type: String
-    
-  SubnetCidrBlockPublic3:
-    Default: 10.168.6.0/24
-    Description: >
-      CIDR block for public (DMZ) subnet located in Availability Zone 3. 
       All resources located on this subnet are provided an IP within this address block. 
     Type: String
     
